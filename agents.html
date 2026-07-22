@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>返佣系统后台 - 代理商管理</title>
+<link rel="stylesheet" href="common.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand"><h1>返佣系统后台</h1><span>Commission Management</span></div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">返佣团队管理</div>
+      <a class="sidebar-item " href="teams.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="6" height="6" rx="1"/><rect x="12" y="5" width="6" height="6" rx="1"/><rect x="2" y="13" width="11" height="6" rx="1"/><rect x="17" y="13" width="1" height="6" rx=".5"/></svg>团队管理</a>
+      <a class="sidebar-item " href="bd-groups.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="7" height="6" rx="1"/><rect x="11" y="3" width="7" height="6" rx="1"/><rect x="2" y="11" width="7" height="6" rx="1"/><rect x="11" y="11" width="7" height="6" rx="1"/></svg>BD组管理</a>
+      <a class="sidebar-item " href="bd-members.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="3"/><circle cx="14" cy="7" r="3"/><path d="M1 17v-1a4 4 0 014-4h4a4 4 0 014 4v1"/><path d="M12 17v-1a4 4 0 014-4h1"/></svg>BD管理</a>
+      <div class="sidebar-section">代理商管理</div>
+      <a class="sidebar-item active" href="agents.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="8" r="4"/><path d="M3 18v-1a5 5 0 015-5h4a5 5 0 015 5v1"/></svg>代理商管理</a>
+      <a class="sidebar-item " href="agent-upline.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 16V4M4 9l6-6 6 6"/></svg>代理商上级查询</a>
+      <a class="sidebar-item " href="agent-downline.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 4v12M4 11l6 6 6-6"/></svg>代理商下级查询</a>
+      <a class="sidebar-item " href="agent-transfer.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h10M10 4l3 3-3 3"/><path d="M17 13H7M10 10l-3 3 3 3"/></svg>代理商迁移</a>
+      <a class="sidebar-item " href="agent-offboard.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="7"/><path d="M7.5 7.5l5 5M12.5 7.5l-5 5"/></svg>代理商清退</a>
+      <a class="sidebar-item " href="agent-demote.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 6l5 5 5-5M5 12l5 5 5-5"/></svg>代理商降级</a>
+    </nav>
+    <div class="sidebar-footer"><div class="avatar">A</div><div class="info">Admin<small>管理员</small></div></div>
+  </aside>
+<div class="main">
+  <div class="breadcrumb"><span>代理商管理</span><span class="sep">/</span><strong >代理商管理</strong></div>
+  <div class="page-header">
+    <div><h2>代理商管理</h2><p>管理所有代理商及其返佣授权配置</p></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-primary" onclick="openAgentModal()">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4v12M4 10h12"/></svg>新建代理商
+      </button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="filter-bar">
+      <div class="search-input"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="5"/><path d="M13 13l4 4"/></svg><input class="form-input" placeholder="搜索代理商名称..." id="af-name-filter"></div>
+      <input class="form-input" placeholder="代理商ID" style="width:110px;" id="af-id-filter">
+      <select class="form-select" style="width:150px;" id="af-type-filter"><option value="">全部团队类型</option><option value="BD--代理商模式">BD--代理商模式</option><option value="BD--地推模式">BD--地推模式</option><option value="卡商--地推模式">卡商--地推模式</option></select>
+      <select class="form-select" style="width:120px;" id="af-level-filter"><option value="">全部层级</option></select>
+      <button class="btn btn-primary" onclick="filterAgents()">查询</button>
+      <button class="btn btn-secondary" onclick="resetAgentFilters()">重置</button>
+    </div>
+    <div class="table-wrap"><table id="agent-table"></table></div>
+    <div class="pagination" id="agent-pagination"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-agent">
+  <div class="modal modal-wide">
+    <div class="modal-header"><h3 id="agent-modal-title">新建代理商</h3><button class="modal-close" onclick="closeAgentModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="section-title">基本信息</div>
+      <div class="form-grid">
+        <div class="full"><div class="form-group"><label class="form-label">代理商名称 <span class="req">*</span></label><input class="form-input" placeholder="例如：华东代理-李明" id="af-name"></div></div>
+        <div><div class="form-group"><label class="form-label">代理层级</label><input class="form-input" type="number" min="1" max="10" value="1" id="af-level"><span class="form-hint">默认为1，每增加一级+1</span></div></div>
+        <div><div class="form-group"><label class="form-label">所属团队 <span class="req">*</span></label><select class="form-select" id="af-team"><option value="">请选择</option></select></div></div>
+        <div><div class="form-group"><label class="form-label">最大返佣深度 <span class="req">*</span></label><input class="form-input" type="number" min="1" max="10" placeholder="如 3" id="af-depth"></div></div>
+      </div>
+      <div class="section-title">返佣授权比例</div>
+      <div class="form-grid">
+        <div><div class="form-group"><label class="form-label">币币合约返佣授权比例</label><div style="display:flex;align-items:center;gap:8px;"><input class="form-input" type="number" min="0" max="100" step="0.1" placeholder="80" id="af-co"><span style="color:rgba(9,9,11,.40);font-size:14px;">%</span></div></div></div>
+        <div><div class="form-group"><label class="form-label">RWA合约返佣授权比例</label><div style="display:flex;align-items:center;gap:8px;"><input class="form-input" type="number" min="0" max="100" step="0.1" placeholder="70" id="af-rwa"><span style="color:rgba(9,9,11,.40);font-size:14px;">%</span></div></div></div>
+        <div><div class="form-group"><label class="form-label">现货返佣授权比例</label><div style="display:flex;align-items:center;gap:8px;"><input class="form-input" type="number" min="0" max="100" step="0.1" placeholder="60" id="af-spot"><span style="color:rgba(9,9,11,.40);font-size:14px;">%</span></div></div></div>
+        <div><div class="form-group"><label class="form-label">充值返佣授权比例</label><div style="display:flex;align-items:center;gap:8px;"><input class="form-input" type="number" min="0" max="100" step="0.1" placeholder="50" id="af-deposit"><span style="color:rgba(9,9,11,.40);font-size:14px;">%</span></div></div></div>
+        <div><div class="form-group"><label class="form-label">充卡返佣授权比例</label><div style="display:flex;align-items:center;gap:8px;"><input class="form-input" type="number" min="0" max="1" step="0.01" placeholder="0.5" id="af-card"><span style="color:rgba(9,9,11,.40);font-size:14px;">%</span></div><span class="form-hint">0%-1%</span></div></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeAgentModal()">取消</button><button class="btn btn-primary" onclick="saveAgent()">保存</button></div>
+  </div>
+</div>
+
+<script src="common.js"></script>
+<script>
+const as = { data:[], filtered:[], page:1, size:10, sort:'', dir:'asc', editingId:null };
+
+function renderAgents() {
+  as.data = [...agentData]; as.filtered = [...agentData]; as.page = 1;
+  updateAgentLevelOptions();
+  renderAgentTable();
+}
+
+function filterAgents() {
+  const name = (document.getElementById('af-name-filter')?.value || '').toLowerCase();
+  const id = (document.getElementById('af-id-filter')?.value || '').trim();
+  const level = document.getElementById('af-level-filter')?.value || '';
+  const afType = document.getElementById('af-type-filter')?.value || '';
+  as.filtered = agentData.filter(a => {
+    if (name && !a.name.toLowerCase().includes(name)) return false;
+    if (id && a.id !== parseInt(id)) return false;
+    if (level && a.level !== parseInt(level)) return false;
+    if (afType && getAgentTeamType(a) !== afType) return false;
+    return true;
+  });
+  as.page = 1; renderAgentTable();
+}
+
+function resetAgentFilters() {
+  ['af-name-filter','af-id-filter','af-type-filter','af-level-filter'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  as.filtered = [...agentData]; as.page = 1; renderAgentTable();
+}
+
+function sortAgents(field) {
+  if (as.sort === field) { as.dir = as.dir === 'asc' ? 'desc' : 'asc'; }
+  else { as.sort = field; as.dir = 'asc'; }
+  renderAgentTable();
+}
+
+function renderAgentTable() {
+  let sorted = [...as.filtered];
+  if (as.sort) {
+    sorted.sort((a,b) => {
+      let va = a[as.sort], vb = b[as.sort];
+      if (typeof va === 'string') va = va.toLowerCase();
+      if (typeof vb === 'string') vb = vb.toLowerCase();
+      return (va < vb ? -1 : va > vb ? 1 : 0) * (as.dir === 'asc' ? 1 : -1);
+    });
+  }
+  const total = sorted.length;
+  const pages = Math.max(1, Math.ceil(total / as.size));
+  if (as.page > pages) as.page = pages;
+  const start = (as.page - 1) * as.size;
+  const pageData = sorted.slice(start, start + as.size);
+
+  const th = (label, field) => `<th class="sortable" onclick="sortAgents('${field}')">${label} ${as.sort===field ? (as.dir==='asc'?'▲':'▼') : '⇅'}</th>`;
+  document.getElementById('agent-table').innerHTML = `
+    <thead><tr>
+      ${th('代理商ID','id')}<th>代理商名称</th>${th('代理层级','level')}<th>团队类型</th>${th('返佣深度','depth')}
+      ${th('币币合约','coRate')}${th('RWA合约','rwaRate')}${th('现货比例','spotRate')}${th('充值返佣','depositRate')}${th('充卡返佣','cardRate')}
+      <th style="text-align:center">创建人</th><th style="text-align:center">创建时间</th><th style="text-align:center">修改人</th><th style="text-align:center">修改时间</th><th style="text-align:center">操作</th>
+    </tr></thead>
+    <tbody>${pageData.length === 0 ? `<tr><td colspan="15"><div class="empty-state"><svg width="40" height="40" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="3" width="16" height="14" rx="1"/><path d="M6 8h8M6 12h5"/></svg>没有找到匹配的代理商</div></td></tr>` : pageData.map(a => `
+      <tr>
+        <td style="color:rgba(9,9,11,.40);font-size:12px;">#${a.id}</td>
+        <td style="font-weight:500;">${a.name}</td>
+        <td style="text-align:center;"><span class="badge ${a.level===1?'badge-emerald':'badge-indigo'}">${a.level} 级</span></td>
+        <td>${badge(getAgentTeamType(a)||'-')}</td>
+        <td style="text-align:center;">${a.depth} 级</td>
+        <td style="text-align:center;font-weight:500;">${a.coRate}%</td>
+        <td style="text-align:center;">${a.rwaRate}%</td>
+        <td style="text-align:center;">${a.spotRate}%</td>
+        <td style="text-align:center;">${a.depositRate}%</td>
+        <td style="text-align:center;">${a.cardRate}%</td>
+        <td style="text-align:center;font-size:13px;">${a.createdBy||'-'}</td>
+        <td style="text-align:center;font-size:12px;color:rgba(9,9,11,.45);">${a.createdAt||'-'}</td>
+        <td style="text-align:center;font-size:13px;">${a.updatedBy||'-'}</td>
+        <td style="text-align:center;font-size:12px;color:rgba(9,9,11,.45);">${a.updatedAt||'-'}</td>
+        <td style="text-align:center;"><a class="link" href="javascript:editAgent(${a.id})">编辑</a></td>
+      </tr>`).join('')}</tbody>`;
+
+  document.getElementById('agent-pagination').innerHTML = `
+    <div class="pagination-info">共 <strong>${total}</strong> 个代理商 &nbsp;|&nbsp; 每页
+      <select class="page-size-select" onchange="as.size=parseInt(this.value);as.page=1;renderAgentTable()">${[5,10,20,50].map(v => `<option value="${v}" ${as.size===v?'selected':''}>${v}</option>`).join('')}</select> 条</div>
+    <div class="pagination-btns">
+      <button class="btn btn-secondary btn-sm" onclick="as.page=1;renderAgentTable()" ${as.page<=1?'disabled':''}>«</button>
+      <button class="btn btn-secondary btn-sm" onclick="as.page--;renderAgentTable()" ${as.page<=1?'disabled':''}>‹</button>
+      <span style="font-size:13px;padding:0 8px;">第 ${as.page} / ${pages} 页</span>
+      <button class="btn btn-secondary btn-sm" onclick="as.page++;renderAgentTable()" ${as.page>=pages?'disabled':''}>›</button>
+      <button class="btn btn-secondary btn-sm" onclick="as.page=pages;renderAgentTable()" ${as.page>=pages?'disabled':''}>»</button>
+    </div>`;
+}
+
+function openAgentModal() {
+  as.editingId = null;
+  document.getElementById('agent-modal-title').textContent = '新建代理商';
+  document.getElementById('af-name').value = '';
+  document.getElementById('af-level').value = '1';
+  var teamSel = document.getElementById('af-team');
+  teamSel.innerHTML = '<option value="">请选择</option>' + teamData.map(function(t) { return '<option value="' + t.id + '">' + t.name + '</option>'; }).join('');
+  teamSel.disabled = false;
+  document.getElementById('af-depth').value = '';
+  document.getElementById('af-co').value = ''; document.getElementById('af-rwa').value = ''; document.getElementById('af-spot').value = ''; document.getElementById('af-deposit').value = ''; document.getElementById('af-card').value = '';
+  document.getElementById('modal-agent').classList.add('open');
+}
+
+function closeAgentModal() { document.getElementById('modal-agent').classList.remove('open'); }
+
+function editAgent(id) {
+  as.editingId = id;
+  document.getElementById('agent-modal-title').textContent = '编辑代理商';
+  const a = agentData.find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('af-name').value = a.name;
+  document.getElementById('af-level').value = a.level;
+  var teamSel = document.getElementById('af-team');
+  teamSel.innerHTML = '<option value="">请选择</option>' + teamData.map(function(t) { return '<option value="' + t.id + '" ' + (t.id===a.teamId?'selected':'') + '>' + t.name + '</option>'; }).join('');
+  teamSel.disabled = true;
+  document.getElementById('af-depth').value = a.depth;
+  document.getElementById('af-co').value = a.coRate;
+  document.getElementById('af-rwa').value = a.rwaRate;
+  document.getElementById('af-spot').value = a.spotRate;
+  document.getElementById('af-deposit').value = a.depositRate;
+  document.getElementById('af-card').value = a.cardRate;
+  document.getElementById('modal-agent').classList.add('open');
+}
+
+function saveAgent() {
+  const name = document.getElementById('af-name').value.trim();
+  const teamId = document.getElementById('af-team').value;
+  if (!name) return alert('请填写代理商名称');
+  if (!teamId) return alert('请选择所属团队');
+  const obj = { id: as.editingId || nextId(agentData), name, teamId: parseInt(teamId), level: parseInt(document.getElementById('af-level').value) || 1, depth: parseInt(document.getElementById('af-depth').value) || 1, coRate: parseFloat(document.getElementById('af-co').value) || 0, rwaRate: parseFloat(document.getElementById('af-rwa').value) || 0, spotRate: parseFloat(document.getElementById('af-spot').value) || 0, depositRate: parseFloat(document.getElementById('af-deposit').value) || 0, cardRate: parseFloat(document.getElementById('af-card').value) || 0, status: '启用', createdBy: as.editingId ? (agentData.find(x=>x.id===as.editingId)?.createdBy||'admin') : 'admin', createdAt: as.editingId ? (agentData.find(x=>x.id===as.editingId)?.createdAt||now()) : now(), updatedBy: 'admin', updatedAt: now() };
+  if (as.editingId) { const idx = agentData.findIndex(x => x.id === as.editingId); if (idx >= 0) agentData[idx] = obj; }
+  else { agentData.push(obj); }
+  closeAgentModal();
+  filterAgents();
+}
+
+document.getElementById('modal-agent').addEventListener('click', function(e) { if (e.target === this) closeAgentModal(); });
+renderAgents();
+</script>
+
+</body>
+</html>

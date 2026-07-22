@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>邀请返佣原型 · 目录</title>
+<style>
+  :root{
+    --ink:#0a0b0d;
+    --ink-soft:#4b4f57;
+    --muted:#8b8f98;
+    --line:#e9eaed;
+    --line-soft:#f1f2f4;
+    --surface:#ffffff;
+    --surface-2:#fafafb;
+    --surface-3:#f4f5f6;
+    --accent:#00c569;
+    --accent-ink:#046a3c;
+    --accent-tint:#e6faf0;
+    --radius:14px;
+    --radius-sm:10px;
+    --maxw:960px;
+    --shadow-xs:0 1px 2px rgba(10,11,13,.04);
+    --shadow-sm:0 2px 8px rgba(10,11,13,.05), 0 1px 2px rgba(10,11,13,.04);
+    --ease:cubic-bezier(.2,.7,.3,1);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+    background:var(--surface);color:var(--ink);line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:56px 24px 80px;}
+  .head{margin-bottom:48px;}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;
+    color:var(--accent-ink);background:var(--accent-tint);padding:4px 10px;border-radius:999px;
+    margin-bottom:14px;letter-spacing:.02em;
+  }
+  h1{font-size:28px;font-weight:800;letter-spacing:-.01em;margin-bottom:8px;}
+  .head p{font-size:14px;color:var(--muted);}
+  .section + .section{margin-top:44px;}
+  .section-title{
+    display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;
+    color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;
+  }
+  .section-title .count{
+    font-size:11px;font-weight:700;color:var(--muted);background:var(--surface-3);
+    padding:2px 8px;border-radius:999px;letter-spacing:0;text-transform:none;
+  }
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+  .card{
+    display:flex;flex-direction:column;gap:6px;
+    border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 20px;background:var(--surface);text-decoration:none;color:inherit;
+    transition:border-color .15s var(--ease),box-shadow .15s var(--ease),transform .15s var(--ease);
+  }
+  .card:hover{border-color:var(--ink-soft);box-shadow:var(--shadow-sm);transform:translateY(-1px);}
+  .card-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .card-title{font-size:15px;font-weight:700;letter-spacing:-.005em;}
+  .card-arrow{
+    color:var(--muted);flex:none;transition:transform .15s var(--ease),color .15s var(--ease);
+  }
+  .card:hover .card-arrow{transform:translate(2px,-2px);color:var(--ink);}
+  .card-desc{font-size:12.5px;color:var(--muted);}
+  .card-file{font-size:11px;color:var(--muted);font-family:ui-monospace,'SF Mono',Menlo,monospace;margin-top:2px;}
+  .card.primary{background:var(--surface-2);}
+
+  @media (max-width:640px){
+    .grid{grid-template-columns:1fr;}
+    h1{font-size:24px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="head">
+    <div class="eyebrow">MSX · 原型目录</div>
+    <h1>邀请返佣原型</h1>
+    <p>前台用户页面与后台管理系统的全部原型入口</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">前台<span class="count">2</span></div>
+    <div class="grid">
+      <a class="card primary" href="invite.html">
+        <div class="card-top">
+          <div class="card-title">邀请好友</div>
+          <svg class="card-arrow" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 14L14 6M8 6h6v6"/></svg>
+        </div>
+        <div class="card-desc">分享邀请码、管理邀请码与Xcard卡号、返佣排行榜</div>
+        <div class="card-file">invite.html</div>
+      </a>
+      <a class="card primary" href="data.html">
+        <div class="card-top">
+          <div class="card-title">邀请数据</div>
+          <svg class="card-arrow" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 14L14 6M8 6h6v6"/></svg>
+        </div>
+        <div class="card-desc">数据概览、邀请用户明细、佣金明细与提现、邀请码管理</div>
+        <div class="card-file">data.html</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">后台<span class="count">9</span></div>
+    <div class="grid">
+      <a class="card" href="teams.html">
+        <div class="card-top">
+          <div class="card-title">团队管理</div>
+          <svg class="card-arrow" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 14L14 6M8 6h6v6"/></svg>
+        </div>
+        <div class="card-desc">团队结构与成员管理</div>
+        <div class="card-file">teams.html</div>
+      </a>
+      <a class="card" href="bd-groups.html">
+        <div class="card-top">
+          <div class="card-title">BD组管理</div>
+          <svg class="card-arrow" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 14L14 6M8 6h6v6"/></svg>
+        </div>
+        <div class="card-desc">BD分组配置与管理</div>
+        <div class="card-file">bd-groups.html</div>
+      </a>
+      <a class="card" href="bd-members.html">
+        <div class="card-top">
+          <div class="card-title">BD管理</div>
+          <svg class="card-arrow" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 14L14 6M8 6h6v6"/></svg>
+        </div>
+        <div class="card-desc">BD人员列表与管理</div>
+        <div class="card-file">bd-members.html</div>
+      </a>
+      <a class="card" href="agents.html">
+        <div class="card-top">
+          <div class="card-title">代理商管理</div>
+          <svg class="card-arrow" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 14L14 6M8 6h6v6"/></svg>
+        </div>
+        <div class="card-desc">代理商列表与详情管理</div>
+        <div class="card-file">agents.html</div>
+      </a>
+      <a class="card" href="agent-upline.html">
+        <div class="card-top">
+          <div class="card-title">代理商上级查询</div>
+          <svg class="card-arrow" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 14L14 6M8 6h6v6"/></svg>
+        </div>
+        <div class="card-desc">查询代理商的上级链路</div>
+        <div class="card-file">agent-upline.html</div>
+      </a>
+      <a class="card" href="agent-downline.html">
+        <div class="card-top">
+          <div class="card-title">代理商下级查询</div>
+          <svg class="card-arrow" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 14L14 6M8 6h6v6"/></svg>
+        </div>
+        <div class="card-desc">查询代理商的下级网络</div>
+        <div class="card-file">agent-downline.html</div>
+      </a>
+      <a class="card" href="agent-transfer.html">
+        <div class="card-top">
+          <div class="card-title">代理商迁移</div>
+          <svg class="card-arrow" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 14L14 6M8 6h6v6"/></svg>
+        </div>
+        <div class="card-desc">代理商归属关系迁移</div>
+        <div class="card-file">agent-transfer.html</div>
+      </a>
+      <a class="card" href="agent-offboard.html">
+        <div class="card-top">
+          <div class="card-title">代理商清退</div>
+          <svg class="card-arrow" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 14L14 6M8 6h6v6"/></svg>
+        </div>
+        <div class="card-desc">代理商清退处理</div>
+        <div class="card-file">agent-offboard.html</div>
+      </a>
+      <a class="card" href="agent-demote.html">
+        <div class="card-top">
+          <div class="card-title">代理商降级</div>
+          <svg class="card-arrow" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 14L14 6M8 6h6v6"/></svg>
+        </div>
+        <div class="card-desc">代理商降级处理</div>
+        <div class="card-file">agent-demote.html</div>
+      </a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

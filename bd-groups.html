@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>返佣系统后台 - BD组管理</title>
+<link rel="stylesheet" href="common.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand"><h1>返佣系统后台</h1><span>Commission Management</span></div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">返佣团队管理</div>
+      <a class="sidebar-item " href="teams.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="6" height="6" rx="1"/><rect x="12" y="5" width="6" height="6" rx="1"/><rect x="2" y="13" width="11" height="6" rx="1"/><rect x="17" y="13" width="1" height="6" rx=".5"/></svg>团队管理</a>
+      <a class="sidebar-item active" href="bd-groups.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="7" height="6" rx="1"/><rect x="11" y="3" width="7" height="6" rx="1"/><rect x="2" y="11" width="7" height="6" rx="1"/><rect x="11" y="11" width="7" height="6" rx="1"/></svg>BD组管理</a>
+      <a class="sidebar-item " href="bd-members.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="3"/><circle cx="14" cy="7" r="3"/><path d="M1 17v-1a4 4 0 014-4h4a4 4 0 014 4v1"/><path d="M12 17v-1a4 4 0 014-4h1"/></svg>BD管理</a>
+      <div class="sidebar-section">代理商管理</div>
+      <a class="sidebar-item " href="agents.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="8" r="4"/><path d="M3 18v-1a5 5 0 015-5h4a5 5 0 015 5v1"/></svg>代理商管理</a>
+      <a class="sidebar-item " href="agent-upline.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 16V4M4 9l6-6 6 6"/></svg>代理商上级查询</a>
+      <a class="sidebar-item " href="agent-downline.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 4v12M4 11l6 6 6-6"/></svg>代理商下级查询</a>
+      <a class="sidebar-item " href="agent-transfer.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h10M10 4l3 3-3 3"/><path d="M17 13H7M10 10l-3 3 3 3"/></svg>代理商迁移</a>
+      <a class="sidebar-item " href="agent-offboard.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="7"/><path d="M7.5 7.5l5 5M12.5 7.5l-5 5"/></svg>代理商清退</a>
+      <a class="sidebar-item " href="agent-demote.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 6l5 5 5-5M5 12l5 5 5-5"/></svg>代理商降级</a>
+    </nav>
+    <div class="sidebar-footer"><div class="avatar">A</div><div class="info">Admin<small>管理员</small></div></div>
+  </aside>
+<div class="main">
+  <div class="breadcrumb"><span>返佣团队管理</span><span class="sep">/</span><strong >BD组管理</strong></div>
+  <div class="page-header">
+    <div><h2>BD组管理</h2><p>管理BD组及其所属团队配置</p></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-primary" onclick="openGroupModal()">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4v12M4 10h12"/></svg>新建BD组
+      </button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="filter-bar">
+      <div class="search-input"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="5"/><path d="M13 13l4 4"/></svg><input class="form-input" placeholder="搜索组名称..." id="gf-name-filter"></div>
+      <input class="form-input" placeholder="组ID" style="width:100px;" id="gf-id-filter">
+      <select class="form-select" style="width:160px;" id="gf-team-filter"><option value="">全部团队</option></select>
+      <select class="form-select" style="width:140px;" id="gf-type-filter"><option value="">全部团队类型</option><option value="BD--代理商模式">BD--代理商模式</option><option value="BD--地推模式">BD--地推模式</option><option value="卡商--地推模式">卡商--地推模式</option><option value="独立代理商模式">独立代理商模式</option></select>
+      <button class="btn btn-primary" onclick="filterGroups()">查询</button>
+      <button class="btn btn-secondary" onclick="resetGroupFilters()">重置</button>
+    </div>
+    <div class="table-wrap"><table id="group-table"></table></div>
+    <div class="pagination" id="group-pagination"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-group">
+  <div class="modal">
+    <div class="modal-header"><h3 id="group-modal-title">新建BD组</h3><button class="modal-close" onclick="closeGroupModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="section-title">基本信息</div>
+      <div class="form-grid">
+        <div class="full"><div class="form-group"><label class="form-label">组名称 <span class="req">*</span></label><span class="form-hint">由后台定义，全局不可重复</span><input class="form-input" placeholder="例如：华北BD-1组" id="gf-name"></div></div>
+        <div class="full"><div class="form-group"><label class="form-label">所属团队 <span class="req">*</span></label><span class="form-hint">决定该组沿用的返佣规则，创建后不可修改</span><select class="form-select" id="gf-team" onchange="onGroupTeamChange()"><option value="">请选择</option></select><div id="gf-team-info" style="display:none;margin-top:12px;"></div></div></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeGroupModal()">取消</button><button class="btn btn-primary" onclick="saveGroup()">保存</button></div>
+  </div>
+</div>
+
+<script src="common.js"></script>
+<script>
+const gs = { data:[], filtered:[], page:1, size:10, sort:'', dir:'asc', editingId:null };
+
+function renderGroups() {
+  gs.data = [...groupData]; gs.filtered = [...groupData]; gs.page = 1;
+  updateGroupTeamOptions();
+  renderGroupTable();
+}
+
+function filterGroups() {
+  const name = (document.getElementById('gf-name-filter')?.value || '').toLowerCase();
+  const id = (document.getElementById('gf-id-filter')?.value || '').trim();
+  const teamId = document.getElementById('gf-team-filter')?.value || '';
+  const teamType = document.getElementById('gf-type-filter')?.value || '';
+  gs.filtered = groupData.filter(g => {
+    if (name && !g.name.toLowerCase().includes(name)) return false;
+    if (id && g.id !== parseInt(id)) return false;
+    if (teamId && g.teamId !== parseInt(teamId)) return false;
+    if (teamType) {
+      const t = getTeam(g.teamId);
+      if (!t || t.type !== teamType) return false;
+    }
+    return true;
+  });
+  gs.page = 1; renderGroupTable();
+}
+
+function resetGroupFilters() {
+  ['gf-name-filter','gf-id-filter','gf-team-filter','gf-type-filter'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  gs.filtered = [...groupData]; gs.page = 1; renderGroupTable();
+}
+
+function sortGroups(field) {
+  if (gs.sort === field) { gs.dir = gs.dir === 'asc' ? 'desc' : 'asc'; }
+  else { gs.sort = field; gs.dir = 'asc'; }
+  renderGroupTable();
+}
+
+function renderGroupTable() {
+  let sorted = [...gs.filtered];
+  if (gs.sort) {
+    sorted.sort((a,b) => {
+      let va = gs.sort === 'teamId' ? getTeamName(a[gs.sort]) : a[gs.sort];
+      let vb = gs.sort === 'teamId' ? getTeamName(b[gs.sort]) : b[gs.sort];
+      if (typeof va === 'string') va = va.toLowerCase();
+      if (typeof vb === 'string') vb = vb.toLowerCase();
+      return (va < vb ? -1 : va > vb ? 1 : 0) * (gs.dir === 'asc' ? 1 : -1);
+    });
+  }
+  const total = sorted.length;
+  const pages = Math.max(1, Math.ceil(total / gs.size));
+  if (gs.page > pages) gs.page = pages;
+  const start = (gs.page - 1) * gs.size;
+  const pageData = sorted.slice(start, start + gs.size);
+
+  const th = (label, field) => `<th class="sortable" onclick="sortGroups('${field}')">${label} ${gs.sort===field ? (gs.dir==='asc'?'▲':'▼') : '⇅'}</th>`;
+  document.getElementById('group-table').innerHTML = `
+    <thead><tr>
+      ${th('组ID','id')}<th>组名称</th>${th('所属团队','teamId')}<th>团队类型</th><th>组长名</th>${th('组员人数','memberCount')}
+      <th style="text-align:center">创建人</th><th style="text-align:center">修改人</th><th style="text-align:center">创建时间</th><th style="text-align:center">修改时间</th><th style="text-align:center">操作</th>
+    </tr></thead>
+    <tbody>${pageData.length === 0 ? `<tr><td colspan="11"><div class="empty-state"><svg width="40" height="40" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="3" width="16" height="14" rx="1"/><path d="M6 8h8M6 12h5"/></svg>没有找到匹配的BD组</div></td></tr>` : pageData.map(g => `
+      <tr>
+        <td style="color:rgba(9,9,11,.40);font-size:12px;">#${g.id}</td>
+        <td style="font-weight:500;">${g.name}</td>
+        <td><span class="badge badge-indigo">${getTeamName(g.teamId)}</span></td>
+        <td>${badge((getTeam(g.teamId)||{}).type||'-')}</td>
+        <td>${g.leaderName || '-'}</td>
+        <td style="text-align:center;font-weight:500;">${g.memberCount}</td>
+        <td style="text-align:center;font-size:13px;">${g.createdBy||'-'}</td>
+        <td style="text-align:center;font-size:13px;">${g.updatedBy||'-'}</td>
+        <td style="text-align:center;font-size:12px;color:rgba(9,9,11,.45);">${g.createdAt||'-'}</td>
+        <td style="text-align:center;font-size:12px;color:rgba(9,9,11,.45);">${g.updatedAt||'-'}</td>
+        <td style="text-align:center;"><a class="link" href="javascript:editGroup(${g.id})">编辑</a> &nbsp;<a class="link" href="javascript:copyGroup(${g.id})">复制</a></td>
+      </tr>`).join('')}</tbody>`;
+
+  document.getElementById('group-pagination').innerHTML = `
+    <div class="pagination-info">共 <strong>${total}</strong> 个BD组 &nbsp;|&nbsp; 每页
+      <select class="page-size-select" onchange="gs.size=parseInt(this.value);gs.page=1;renderGroupTable()">${[5,10,20,50].map(v => `<option value="${v}" ${gs.size===v?'selected':''}>${v}</option>`).join('')}</select> 条</div>
+    <div class="pagination-btns">
+      <button class="btn btn-secondary btn-sm" onclick="gs.page=1;renderGroupTable()" ${gs.page<=1?'disabled':''}>«</button>
+      <button class="btn btn-secondary btn-sm" onclick="gs.page--;renderGroupTable()" ${gs.page<=1?'disabled':''}>‹</button>
+      <span style="font-size:13px;padding:0 8px;">第 ${gs.page} / ${pages} 页</span>
+      <button class="btn btn-secondary btn-sm" onclick="gs.page++;renderGroupTable()" ${gs.page>=pages?'disabled':''}>›</button>
+      <button class="btn btn-secondary btn-sm" onclick="gs.page=pages;renderGroupTable()" ${gs.page>=pages?'disabled':''}>»</button>
+    </div>`;
+}
+
+const cardReqLabelMap = { linked: '关联U卡', active: '激活U卡' };
+function lineTooltipHTML(l) {
+  let rows = '';
+  if (l.mode === 'tier' && l.tiers && l.tiers.length) {
+    rows += l.tiers.map((t, i) => {
+      const lower = (i === 0 ? 0 : (l.tiers[i-1].amount || 0)).toLocaleString();
+      const isLast = i === l.tiers.length - 1;
+      const range = isLast ? `&gt; ${lower}` : `${lower} - ${(t.amount||0).toLocaleString()}`;
+      return `<div class="hover-tip-row"><span>${range}</span><strong>${t.rate}%</strong></div>`;
+    }).join('');
+  }
+  if (l.cardReq && l.cardReq !== 'none') {
+    const limitParts = [];
+    if (l.silverLimit) limitParts.push(`银卡≥${l.silverLimit.toLocaleString()}`);
+    if (l.goldLimit) limitParts.push(`金卡≥${l.goldLimit.toLocaleString()}`);
+    if (l.blackLimit) limitParts.push(`黑卡≥${l.blackLimit.toLocaleString()}`);
+    rows += `<div class="hover-tip-row"><span>结算要求</span><strong>${cardReqLabelMap[l.cardReq]||l.cardReq}</strong></div>`;
+    if (limitParts.length) rows += `<div class="hover-tip-row"><span>充值限额</span><strong style="font-weight:500;">${limitParts.join(' / ')}</strong></div>`;
+  }
+  return rows;
+}
+function onGroupTeamChange() {
+  const teamId = document.getElementById('gf-team').value;
+  const el = document.getElementById('gf-team-info');
+  if (!teamId) { el.style.display = 'none'; return; }
+  const t = getTeam(parseInt(teamId));
+  if (!t) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  el.innerHTML = `<div class="info-box">
+    <div class="row">
+      <div class="item"><span class="label">团队类型</span><span class="value">${t.type}</span></div>
+      <div class="item"><span class="label">返佣深度</span><span class="value">${t.depth} 级</span></div>
+      <div class="item"><span class="label">结算周期</span><span class="value">${t.cycle}</span></div>
+      <div class="item"><span class="label">状态</span><span class="value">${t.status==='enabled'?'<span class="badge badge-emerald">启用</span>':'<span class="badge badge-slate">停用</span>'}</span></div>
+      <div class="item"><span class="label">强制绑卡</span><span class="value">${t.requireCard?'<span class="badge badge-amber">是</span>':'<span class="badge badge-slate">否</span>'}</span></div>
+      <div class="item"><span class="label">叠加手续费</span><span class="value">${t.extraFee?'<span class="badge badge-amber">是</span>':'<span class="badge badge-slate">否</span>'}</span></div>
+    </div>
+    <div class="row rate-row">
+      ${['co','spot','deposit','card'].map(k => {
+        const label = {co:'合约',spot:'现货',deposit:'充值',card:'充卡'}[k];
+        const l = (t.lines || {})[k] || {};
+        if (!l.enabled) return `<span>${label} <strong>未启用</strong></span>`;
+        const val = l.mode === 'tier' ? '阶梯' : l.rate + '%';
+        const hasExtra = l.mode === 'tier' || (l.cardReq && l.cardReq !== 'none');
+        if (hasExtra) {
+          return `<span>${label} <span class="hover-tip-wrap"><strong>${val}</strong><span class="hover-tip">${lineTooltipHTML(l)}</span></span></span>`;
+        }
+        return `<span>${label} <strong>${val}</strong></span>`;
+      }).join(' · ')}
+    </div>
+  </div>`;
+}
+
+function openGroupModal() {
+  gs.editingId = null;
+  document.getElementById('group-modal-title').textContent = '新建BD组';
+  document.getElementById('gf-name').value = '';
+  const sel = document.getElementById('gf-team');
+  sel.innerHTML = '<option value="">请选择</option>' + teamData.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+  sel.disabled = false;
+  document.getElementById('gf-team-info').style.display = 'none';
+  document.getElementById('modal-group').classList.add('open');
+}
+
+function closeGroupModal() { document.getElementById('modal-group').classList.remove('open'); }
+
+function copyGroup(id) {
+  gs.editingId = null;
+  document.getElementById('group-modal-title').textContent = '新建BD组';
+  const g = groupData.find(x => x.id === id);
+  if (!g) return;
+  document.getElementById('gf-name').value = g.name + ' - 副本';
+  const sel = document.getElementById('gf-team');
+  sel.innerHTML = '<option value="">请选择</option>' + teamData.map(t => `<option value="${t.id}" ${t.id===g.teamId?'selected':''}>${t.name}</option>`).join('');
+  sel.disabled = false;
+  onGroupTeamChange();
+  document.getElementById('modal-group').classList.add('open');
+}
+
+function editGroup(id) {
+  gs.editingId = id;
+  document.getElementById('group-modal-title').textContent = '编辑BD组';
+  const g = groupData.find(x => x.id === id);
+  if (!g) return;
+  document.getElementById('gf-name').value = g.name;
+  const sel = document.getElementById('gf-team');
+  sel.innerHTML = '<option value="">请选择</option>' + teamData.map(t => `<option value="${t.id}" ${t.id===g.teamId?'selected':''}>${t.name}</option>`).join('');
+  sel.disabled = true;
+  onGroupTeamChange();
+  document.getElementById('modal-group').classList.add('open');
+}
+
+function saveGroup() {
+  const name = document.getElementById('gf-name').value.trim();
+  const teamId = document.getElementById('gf-team').value;
+  if (!name) return alert('请填写组名称');
+  if (!teamId) return alert('请选择所属团队');
+  const existing = gs.editingId ? groupData.find(x => x.id === gs.editingId) : null;
+  const obj = { id: gs.editingId || nextId(groupData), name, teamId: parseInt(teamId), leaderUid: existing ? existing.leaderUid : '', leaderName: existing ? existing.leaderName : '', memberCount: existing ? existing.memberCount : 0, createdBy: existing ? existing.createdBy : 'admin', createdAt: existing ? existing.createdAt : now(), updatedBy: 'admin', updatedAt: now() };
+  if (gs.editingId) { const idx = groupData.findIndex(x => x.id === gs.editingId); if (idx >= 0) groupData[idx] = obj; }
+  else { groupData.push(obj); }
+  closeGroupModal();
+  filterGroups();
+}
+
+document.getElementById('modal-group').addEventListener('click', function(e) { if (e.target === this) closeGroupModal(); });
+renderGroups();
+</script>
+
+</body>
+</html>

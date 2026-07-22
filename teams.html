@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>返佣系统后台 - 团队管理</title>
+<link rel="stylesheet" href="common.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <h1>返佣系统后台</h1>
+      <span>Commission Management</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">返佣团队管理</div>
+      <a class="sidebar-item active" href="teams.html">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="6" height="6" rx="1"/><rect x="12" y="5" width="6" height="6" rx="1"/><rect x="2" y="13" width="11" height="6" rx="1"/><rect x="17" y="13" width="1" height="6" rx=".5"/></svg>
+        团队管理
+      </a>
+      <a class="sidebar-item " href="bd-groups.html">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="7" height="6" rx="1"/><rect x="11" y="3" width="7" height="6" rx="1"/><rect x="2" y="11" width="7" height="6" rx="1"/><rect x="11" y="11" width="7" height="6" rx="1"/></svg>
+        BD组管理
+      </a>
+      <a class="sidebar-item " href="bd-members.html">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="3"/><circle cx="14" cy="7" r="3"/><path d="M1 17v-1a4 4 0 014-4h4a4 4 0 014 4v1"/><path d="M12 17v-1a4 4 0 014-4h1"/></svg>
+        BD管理
+      </a>
+      <div class="sidebar-section">代理商管理</div>
+      <a class="sidebar-item " href="agents.html">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="8" r="4"/><path d="M3 18v-1a5 5 0 015-5h4a5 5 0 015 5v1"/></svg>
+        代理商管理
+      </a>
+      <a class="sidebar-item " href="agent-upline.html">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 16V4M4 9l6-6 6 6"/></svg>
+        代理商上级查询
+      </a>
+      <a class="sidebar-item " href="agent-downline.html">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 4v12M4 11l6 6 6-6"/></svg>
+        代理商下级查询
+      </a>
+      <a class="sidebar-item " href="agent-transfer.html">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h10M10 4l3 3-3 3"/><path d="M17 13H7M10 10l-3 3 3 3"/></svg>
+        代理商迁移
+      </a>
+      <a class="sidebar-item " href="agent-offboard.html">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="7"/><path d="M7.5 7.5l5 5M12.5 7.5l-5 5"/></svg>
+        代理商清退
+      </a>
+      <a class="sidebar-item " href="agent-demote.html">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 6l5 5 5-5M5 12l5 5 5-5"/></svg>
+        代理商降级
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="avatar">A</div>
+      <div class="info">Admin<small>管理员</small></div>
+    </div>
+  </aside>
+<div class="main">
+  <div class="breadcrumb">
+    <span>返佣团队管理</span><span class="sep">/</span><strong >团队管理</strong>
+  </div>
+  <div class="page-header">
+    <div><h2>团队管理</h2><p>管理所有返佣团队及其授权配置</p></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-primary" onclick="openTeamModal()">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4v12M4 10h12"/></svg>
+        新建团队
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="filter-bar">
+      <div class="search-input"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="5"/><path d="M13 13l4 4"/></svg><input class="form-input" placeholder="搜索团队名称..." id="tf-name-filter"></div>
+      <input class="form-input" placeholder="团队ID" style="width:100px;" id="tf-id-filter">
+      <select class="form-select" style="width:140px;" id="tf-type-filter"><option value="">全部类型</option><option value="BD--代理商模式">BD--代理商模式</option><option value="BD--地推模式">BD--地推模式</option><option value="卡商--地推模式">卡商--地推模式</option><option value="独立代理商模式">独立代理商模式</option></select>
+      <select class="form-select" style="width:130px;" id="tf-cycle-filter"><option value="">结算周期</option><option value="日结算">日结算</option><option value="周结算">周结算</option><option value="月结算">月结算</option></select>
+      <select class="form-select" style="width:110px;" id="tf-status-filter"><option value="">全部状态</option><option value="enabled">启用</option><option value="disabled">停用</option></select>
+      <button class="btn btn-primary" onclick="filterTeams()">查询</button>
+      <button class="btn btn-secondary" onclick="resetTeamFilters()">重置</button>
+    </div>
+    <div class="table-wrap"><table id="team-table"></table></div>
+    <div class="pagination" id="team-pagination"></div>
+  </div>
+</div>
+
+<!-- Team Modal -->
+<div class="modal-overlay" id="modal-team">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <h3 id="team-modal-title">新建返佣团队</h3>
+      <button class="modal-close" onclick="closeTeamModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="section-title">基本信息</div>
+
+      <div class="subsection-label">团队标识</div>
+      <div class="form-grid">
+        <div class="full"><div class="form-group"><label class="form-label">团队名称 <span class="req">*</span></label><span class="form-hint">由后台定义，全局不可重复</span><input class="form-input" placeholder="例如：华北BD团队" id="tf-name"></div></div>
+        <div><div class="form-group"><label class="form-label">团队类型 <span class="req">*</span></label><span class="form-hint">决定代理层级和返佣结构，创建后不可修改</span><select class="form-select" id="tf-type"><option value="">请选择</option><option value="BD--代理商模式">BD--代理商模式</option><option value="BD--地推模式">BD--地推模式</option><option value="卡商--地推模式">卡商--地推模式</option><option value="独立代理商模式">独立代理商模式</option></select></div></div>
+        <div><div class="form-group"><label class="form-label">最大允许返佣深度 <span class="req">*</span></label><span class="form-hint">最多支持的返佣层级</span><input class="form-input" type="number" min="1" max="10" placeholder="如 3" id="tf-depth"></div></div>
+      </div>
+
+      <div class="subsection-label">参与规则</div>
+      <div class="form-grid">
+        <div><div class="form-group"><label class="form-label">是否强制绑卡</label><span class="form-hint">开启后需绑定实体卡才能参与返佣</span><div id="tf-requirecard-wrap"></div></div></div>
+        <div><div class="form-group"><label class="form-label">是否收叠加充值手续费</label><span class="form-hint">在链上手续费基础上额外加收</span><div id="tf-extrafee-wrap"></div></div></div>
+      </div>
+
+      <div class="subsection-label">结算与状态</div>
+      <div class="form-grid">
+        <div><div class="form-group"><label class="form-label">返佣结算周期 <span class="req">*</span></label><span class="form-hint">控制该团队返佣多久发放结算一次</span><select class="form-select" id="tf-cycle"><option value="daily">日结算</option><option value="weekly">周结算</option><option value="monthly">月结算</option></select></div></div>
+        <div><div class="form-group"><label class="form-label">结算状态 <span class="req">*</span></label><span class="form-hint">停用后团队整体暂停参与返佣结算</span><div id="tf-status-wrap"></div></div></div>
+      </div>
+
+      <div class="section-title" style="font-size:14px;color:var(--text);">返佣设置</div>
+      <div class="tab-bar" id="team-line-tabbar"></div>
+      <div id="team-lines-container"><!-- 合约/现货/充值/充卡 四段返佣设置，由 JS 生成 --></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeTeamModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveTeam()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script src="common.js"></script>
+<script>
+// ═══════════ Team Page State ═══════════
+const ts = { data:[], filtered:[], page:1, size:10, sort:'', dir:'asc', editingId:null };
+const LINE_DEFS = [
+  { key:'co',      label:'合约', rateMax:100, rateStep:0.1 },
+  { key:'spot',    label:'现货', rateMax:100, rateStep:0.1 },
+  { key:'deposit', label:'充值', rateMax:1,   rateStep:0.01 },
+  { key:'card',    label:'充卡', rateMax:1,   rateStep:0.01 },
+];
+let teamTempTiers = { co:[], spot:[], deposit:[], card:[] };
+
+// ── 生成 tab 栏 + 四段返佣设置面板 HTML ──
+function lineTabHTML(d, i) {
+  return `<button type="button" class="tab-btn${i===0?' active':''}" id="tf-tab-${d.key}" onclick="switchLineTab('${d.key}')">
+    <span class="tab-dot" id="tf-tab-dot-${d.key}"></span>${d.label}返佣
+  </button>`;
+}
+function lineSectionHTML(d, i) {
+  return `
+    <div class="tab-panel${i===0?' active':''}" id="tf-panel-${d.key}">
+    <div class="form-grid">
+      <div><div class="form-group">
+        <label class="form-label">是否启用${d.label}返佣</label>
+        <span class="form-hint">关闭后该业务线的交易不参与返佣结算</span>
+        <div class="toggle-row-wrap">
+          <label class="toggle-switch"><input type="checkbox" id="tf-${d.key}-enabled" onchange="toggleLineFields('${d.key}')"><span class="toggle-slider"></span></label>
+          <span class="toggle-text" id="tf-${d.key}-enabled-label">否</span>
+        </div>
+      </div></div>
+    </div>
+    <div id="tf-${d.key}-body" style="display:none;margin-top:26px;">
+      <div class="field-box">
+        <div class="field-box-title">返佣比例</div>
+        <div class="form-grid">
+          <div><div class="form-group"><label class="form-label">${d.label}返佣方式</label>
+            <span class="form-hint">绝对值为固定比例，累计梯度按交易额自动匹配</span>
+            <select class="form-select" id="tf-${d.key}-mode" onchange="toggleLineMode('${d.key}')">
+              <option value="flat">绝对值</option><option value="tier">累计梯度</option>
+            </select>
+          </div></div>
+          <div id="tf-${d.key}-flat"><div class="form-group"><label class="form-label">团队${d.label}返佣授权比例</label>
+            <span class="form-hint">团队最高比例；${d.rateMax===100 ? '0-100%整数' : '0-1%，2位小数'}</span>
+            <div style="display:flex;align-items:center;gap:8px;"><input class="form-input" type="number" min="0" max="${d.rateMax}" step="${d.rateStep}" id="tf-${d.key}-rate"><span style="color:rgba(9,9,11,.40);font-size:14px;">%</span></div>
+          </div></div>
+        </div>
+        <div id="tf-${d.key}-tier" style="display:none;margin-top:22px;">
+          <div class="form-group">
+            <label class="form-label">团队${d.label}返佣授权梯度</label>
+            <span class="form-hint">按累计交易额自动匹配对应比例</span>
+            <div id="tf-${d.key}-gradient-list" style="display:flex;flex-direction:column;gap:12px;margin-top:4px;"></div>
+            <button type="button" class="btn btn-secondary btn-sm" style="margin-top:14px;width:fit-content;" onclick="addTeamTier('${d.key}')">+ 添加梯度</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-box">
+        <div class="field-box-title">U卡结算要求</div>
+        <div class="form-grid">
+          <div><div class="form-group"><label class="form-label">${d.label}返佣结算U卡要求</label>
+            <span class="form-hint">启用后需满足对应持卡充值要求才可结算</span>
+            <select class="form-select" id="tf-${d.key}-cardreq" onchange="toggleCardLimits('${d.key}')">
+              <option value="none">不启用</option><option value="linked">关联U卡</option><option value="active">激活U卡</option>
+            </select>
+          </div></div>
+        </div>
+        <div id="tf-${d.key}-limits" style="display:none;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:22px;">
+          <div class="form-group"><label class="form-label">银卡充值限额</label><span class="form-hint">充值达标才可参与结算</span><input class="form-input" type="number" min="0" id="tf-${d.key}-silver"></div>
+          <div class="form-group"><label class="form-label">金卡充值限额</label><span class="form-hint">充值达标才可参与结算</span><input class="form-input" type="number" min="0" id="tf-${d.key}-gold"></div>
+          <div class="form-group"><label class="form-label">黑卡充值限额</label><span class="form-hint">充值达标才可参与结算</span><input class="form-input" type="number" min="0" id="tf-${d.key}-black"></div>
+        </div>
+      </div>
+    </div>
+    </div>`;
+}
+document.getElementById('team-line-tabbar').innerHTML = LINE_DEFS.map(lineTabHTML).join('');
+document.getElementById('team-lines-container').innerHTML = LINE_DEFS.map(lineSectionHTML).join('');
+
+// ── 开关组件 ──
+function toggleSwitchHTML(id, onLabel, offLabel, onchangeJs) {
+  return `<div class="toggle-row-wrap">
+    <label class="toggle-switch"><input type="checkbox" id="${id}" onchange="${onchangeJs}"><span class="toggle-slider"></span></label>
+    <span class="toggle-text" id="${id}-label">${offLabel}</span>
+  </div>`;
+}
+function syncToggleLabel(id, onLabel, offLabel) {
+  document.getElementById(`${id}-label`).textContent = document.getElementById(id).checked ? onLabel : offLabel;
+}
+function setToggle(id, checked, onLabel, offLabel) {
+  document.getElementById(id).checked = !!checked;
+  document.getElementById(`${id}-label`).textContent = checked ? onLabel : offLabel;
+}
+document.getElementById('tf-requirecard-wrap').innerHTML = toggleSwitchHTML('tf-requirecard', '是', '否', "syncToggleLabel('tf-requirecard','是','否')");
+document.getElementById('tf-extrafee-wrap').innerHTML = toggleSwitchHTML('tf-extrafee', '是', '否', "syncToggleLabel('tf-extrafee','是','否')");
+document.getElementById('tf-status-wrap').innerHTML = toggleSwitchHTML('tf-status', '启用', '停用', "syncToggleLabel('tf-status','启用','停用')");
+
+function switchLineTab(key) {
+  LINE_DEFS.forEach(d => {
+    document.getElementById(`tf-tab-${d.key}`).classList.toggle('active', d.key === key);
+    document.getElementById(`tf-panel-${d.key}`).classList.toggle('active', d.key === key);
+  });
+}
+
+// ── 表单内联动 ──
+function toggleLineFields(key) {
+  const on = document.getElementById(`tf-${key}-enabled`).checked;
+  document.getElementById(`tf-${key}-body`).style.display = on ? 'block' : 'none';
+  document.getElementById(`tf-tab-dot-${key}`).classList.toggle('on', on);
+  document.getElementById(`tf-${key}-enabled-label`).textContent = on ? '是' : '否';
+}
+function toggleCardLimits(key) {
+  const show = document.getElementById(`tf-${key}-cardreq`).value !== 'none';
+  document.getElementById(`tf-${key}-limits`).style.display = show ? 'grid' : 'none';
+}
+function toggleLineMode(key) {
+  const tier = document.getElementById(`tf-${key}-mode`).value === 'tier';
+  document.getElementById(`tf-${key}-flat`).style.display = tier ? 'none' : 'grid';
+  document.getElementById(`tf-${key}-tier`).style.display = tier ? 'block' : 'none';
+  if (tier) renderTeamTierList(key);
+}
+// ── 梯度表管理（团队表单专用，独立于 BD 表单的 temp 状态）──
+function renderTeamTierList(key) {
+  const list = document.getElementById(`tf-${key}-gradient-list`);
+  if (!list) return;
+  const tiers = teamTempTiers[key] || [];
+  list.innerHTML = tiers.map((t, i) => {
+    const isLast = i === tiers.length - 1;
+    const lower = (i === 0 ? 0 : (tiers[i-1].amount || 0)).toLocaleString();
+    return `
+    <div style="display:flex;align-items:center;gap:8px;padding:2px 0;flex-wrap:wrap;">
+      <span style="font-size:12px;color:rgba(9,9,11,.4);white-space:nowrap;flex-shrink:0;">交易额区间</span>
+      <input class="form-input" type="text" value="${lower}" disabled style="width:130px;">
+      <span style="color:var(--text-muted);flex-shrink:0;">—</span>
+      <input class="form-input" type="number" min="0" step="1" value="${t.amount||''}" placeholder="${isLast ? '不限' : '上限'}" style="width:130px;" onchange="teamTempTiers['${key}'][${i}].amount=parseFloat(this.value)||0;renderTeamTierList('${key}')">
+      <span style="font-size:12px;color:rgba(9,9,11,.45);white-space:nowrap;">，返佣比例</span>
+      <input class="form-input" type="number" min="0" max="100" step="0.1" value="${t.rate||''}" placeholder="%" style="width:90px;" onchange="teamTempTiers['${key}'][${i}].rate=parseFloat(this.value)||0">
+      <span style="font-size:12px;color:rgba(9,9,11,.45);">%</span>
+      <button type="button" class="icon-btn-ghost" title="删除该梯度" onclick="removeTeamTier('${key}',${i})">✕</button>
+    </div>`;
+  }).join('') || `<div class="tier-empty-hint">尚未添加梯度，点击下方按钮添加</div>`;
+}
+function addTeamTier(key) {
+  teamTempTiers[key] = teamTempTiers[key] || [];
+  const tiers = teamTempTiers[key];
+  if (tiers.length > 0 && !tiers[tiers.length - 1].amount) {
+    alert('请先填写当前梯度的交易额上限，再添加下一档');
+    return;
+  }
+  tiers.push({ amount:0, rate:0 });
+  renderTeamTierList(key);
+}
+function removeTeamTier(key, i) {
+  teamTempTiers[key].splice(i, 1);
+  renderTeamTierList(key);
+}
+
+// ── 读取 / 写入某条业务线的表单值 ──
+function fillLineForm(key, line) {
+  document.getElementById(`tf-${key}-enabled`).checked = !!line.enabled;
+  document.getElementById(`tf-${key}-cardreq`).value = line.cardReq || 'none';
+  document.getElementById(`tf-${key}-silver`).value = line.silverLimit || '';
+  document.getElementById(`tf-${key}-gold`).value = line.goldLimit || '';
+  document.getElementById(`tf-${key}-black`).value = line.blackLimit || '';
+  document.getElementById(`tf-${key}-mode`).value = line.mode || 'flat';
+  document.getElementById(`tf-${key}-rate`).value = line.rate || '';
+  teamTempTiers[key] = (line.tiers || []).map(t => ({ amount:t.amount, rate:t.rate }));
+  toggleLineFields(key);
+  toggleCardLimits(key);
+  toggleLineMode(key);
+}
+function readLineForm(key) {
+  const line = {
+    enabled: document.getElementById(`tf-${key}-enabled`).checked,
+    cardReq: document.getElementById(`tf-${key}-cardreq`).value,
+    silverLimit: parseFloat(document.getElementById(`tf-${key}-silver`).value) || 0,
+    goldLimit: parseFloat(document.getElementById(`tf-${key}-gold`).value) || 0,
+    blackLimit: parseFloat(document.getElementById(`tf-${key}-black`).value) || 0,
+    mode: document.getElementById(`tf-${key}-mode`).value,
+    rate: parseFloat(document.getElementById(`tf-${key}-rate`).value) || 0,
+    tiers: (teamTempTiers[key] || []).slice(),
+  };
+  return line;
+}
+
+// ── 已启用业务线 badge ──
+function enabledLinesBadges(lines) {
+  return LINE_DEFS.filter(d => (lines || {})[d.key]?.enabled)
+    .map(d => `<span class="badge badge-slate">${d.label}</span>`).join(' ') || '<span class="form-hint">无</span>';
+}
+function lineSummary(l) { return !l || !l.enabled ? '未启用' : (l.mode === 'tier' ? '阶梯' : l.rate + '%'); }
+
+function renderTeams() {
+  ts.data = [...teamData]; ts.filtered = [...teamData]; ts.page = 1;
+  renderTeamTable();
+}
+
+function filterTeams() {
+  const name = (document.getElementById('tf-name-filter')?.value || '').toLowerCase();
+  const id = (document.getElementById('tf-id-filter')?.value || '').trim();
+  const type = document.getElementById('tf-type-filter')?.value || '';
+  const cycle = document.getElementById('tf-cycle-filter')?.value || '';
+  const status = document.getElementById('tf-status-filter')?.value || '';
+  ts.filtered = teamData.filter(t => {
+    if (name && !t.name.toLowerCase().includes(name)) return false;
+    if (id && t.id !== parseInt(id)) return false;
+    if (type && t.type !== type) return false;
+    if (cycle && t.cycle !== cycle) return false;
+    if (status && t.status !== status) return false;
+    return true;
+  });
+  ts.page = 1;
+  renderTeamTable();
+}
+
+function resetTeamFilters() {
+  ['tf-name-filter','tf-id-filter','tf-type-filter','tf-cycle-filter','tf-status-filter'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  ts.filtered = [...teamData]; ts.page = 1;
+  renderTeamTable();
+}
+
+function sortTeams(field) {
+  if (ts.sort === field) { ts.dir = ts.dir === 'asc' ? 'desc' : 'asc'; }
+  else { ts.sort = field; ts.dir = 'asc'; }
+  renderTeamTable();
+}
+
+function renderTeamTable() {
+  let sorted = [...ts.filtered];
+  if (ts.sort) {
+    const order = { '日结算':1, '周结算':2, '月结算':3 };
+    sorted.sort((a,b) => {
+      let va = ts.sort === 'cycle' ? (order[a[ts.sort]]||0) : a[ts.sort];
+      let vb = ts.sort === 'cycle' ? (order[b[ts.sort]]||0) : b[ts.sort];
+      if (typeof va === 'string') va = va.toLowerCase();
+      if (typeof vb === 'string') vb = vb.toLowerCase();
+      return (va < vb ? -1 : va > vb ? 1 : 0) * (ts.dir === 'asc' ? 1 : -1);
+    });
+  }
+  const total = sorted.length;
+  const pages = Math.max(1, Math.ceil(total / ts.size));
+  if (ts.page > pages) ts.page = pages;
+  const start = (ts.page - 1) * ts.size;
+  const pageData = sorted.slice(start, start + ts.size);
+
+  const th = (label, field) => `<th class="sortable" onclick="sortTeams('${field}')">${label} ${ts.sort===field ? (ts.dir==='asc'?'▲':'▼') : '⇅'}</th>`;
+  document.getElementById('team-table').innerHTML = `
+    <thead><tr>
+      ${th('团队ID','id')}<th>团队名称</th><th>团队类型</th><th style="text-align:center">返佣深度</th>
+      <th style="text-align:center">强制绑卡</th><th style="text-align:center">叠加手续费</th>
+      <th>已启用业务线</th>
+      ${th('结算周期','cycle')}<th style="text-align:center">状态</th><th style="text-align:center">创建人</th><th style="text-align:center">修改人</th><th style="text-align:center">创建时间</th><th style="text-align:center">修改时间</th><th style="text-align:center">操作</th>
+    </tr></thead>
+    <tbody>${pageData.length === 0 ? `<tr><td colspan="14"><div class="empty-state"><svg width="40" height="40" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="3" width="16" height="14" rx="1"/><path d="M6 8h8M6 12h5"/></svg>没有找到匹配的团队</div></td></tr>` : pageData.map(t => `
+      <tr>
+        <td style="color:rgba(9,9,11,.40);font-size:12px;">#${t.id}</td>
+        <td style="font-weight:500;">${t.name}</td>
+        <td>${badge(t.type)}</td>
+        <td style="text-align:center;">${t.depth} 级</td>
+        <td style="text-align:center;">${t.requireCard ? '<span class="badge badge-amber">是</span>' : '<span class="badge badge-slate">否</span>'}</td>
+        <td style="text-align:center;">${t.extraFee ? '<span class="badge badge-amber">是</span>' : '<span class="badge badge-slate">否</span>'}</td>
+        <td style="white-space:normal;min-width:220px;">${enabledLinesBadges(t.lines)}</td>
+        <td style="text-align:center;font-size:13px;">${t.cycle}</td>
+        <td style="text-align:center;">${t.status==='enabled' ? '<span class="badge badge-emerald">启用</span>' : '<span class="badge badge-slate">停用</span>'}</td>
+        <td style="text-align:center;font-size:13px;">${t.createdBy}</td>
+        <td style="text-align:center;font-size:13px;">${t.updatedBy}</td>
+        <td style="text-align:center;font-size:12px;color:rgba(9,9,11,.45);">${t.createdAt}</td>
+        <td style="text-align:center;font-size:12px;color:rgba(9,9,11,.45);">${t.updatedAt}</td>
+        <td style="text-align:center;"><a class="link" href="javascript:editTeam(${t.id})">编辑</a> &nbsp;<a class="link" href="javascript:copyTeam(${t.id})">复制</a></td>
+      </tr>`).join('')}</tbody>`;
+
+  document.getElementById('team-pagination').innerHTML = `
+    <div class="pagination-info">共 <strong>${total}</strong> 个团队 &nbsp;|&nbsp; 每页
+      <select class="page-size-select" onchange="ts.size=parseInt(this.value);ts.page=1;renderTeamTable()">
+        ${[5,10,20,50].map(v => `<option value="${v}" ${ts.size===v?'selected':''}>${v}</option>`).join('')}</select> 条</div>
+    <div class="pagination-btns">
+      <button class="btn btn-secondary btn-sm" onclick="ts.page=1;renderTeamTable()" ${ts.page<=1?'disabled':''}>«</button>
+      <button class="btn btn-secondary btn-sm" onclick="ts.page--;renderTeamTable()" ${ts.page<=1?'disabled':''}>‹</button>
+      <span style="font-size:13px;padding:0 8px;color:rgba(9,9,11,.75);">第 ${ts.page} / ${pages} 页</span>
+      <button class="btn btn-secondary btn-sm" onclick="ts.page++;renderTeamTable()" ${ts.page>=pages?'disabled':''}>›</button>
+      <button class="btn btn-secondary btn-sm" onclick="ts.page=pages;renderTeamTable()" ${ts.page>=pages?'disabled':''}>»</button>
+    </div>`;
+}
+
+function resetLineForms() {
+  LINE_DEFS.forEach(d => {
+    teamTempTiers[d.key] = [];
+    fillLineForm(d.key, emptyTeamLine());
+  });
+}
+
+function openTeamModal() {
+  ts.editingId = null;
+  document.getElementById('team-modal-title').textContent = '新建返佣团队';
+  document.getElementById('tf-name').value = '';
+  document.getElementById('tf-type').value = '';
+  document.getElementById('tf-type').disabled = false;
+  document.getElementById('tf-depth').value = '';
+  setToggle('tf-requirecard', false, '是', '否');
+  setToggle('tf-extrafee', false, '是', '否');
+  document.getElementById('tf-cycle').value = 'daily';
+  setToggle('tf-status', true, '启用', '停用');
+  resetLineForms();
+  switchLineTab('co');
+  document.getElementById('modal-team').classList.add('open');
+}
+
+function closeTeamModal() { document.getElementById('modal-team').classList.remove('open'); }
+
+function fillTeamForm(t) {
+  document.getElementById('tf-name').value = t.name;
+  document.getElementById('tf-type').value = t.type;
+  document.getElementById('tf-depth').value = t.depth;
+  setToggle('tf-requirecard', t.requireCard, '是', '否');
+  setToggle('tf-extrafee', t.extraFee, '是', '否');
+  document.getElementById('tf-cycle').value = revCycleMap[t.cycle];
+  setToggle('tf-status', (t.status || 'enabled') !== 'disabled', '启用', '停用');
+  LINE_DEFS.forEach(d => fillLineForm(d.key, (t.lines || {})[d.key] || emptyTeamLine()));
+}
+
+function copyTeam(id) {
+  ts.editingId = null;
+  document.getElementById('team-modal-title').textContent = '新建返佣团队';
+  const t = teamData.find(x => x.id === id);
+  if (!t) return;
+  fillTeamForm(t);
+  document.getElementById('tf-name').value = t.name + ' - 副本';
+  document.getElementById('tf-type').disabled = false;
+  switchLineTab('co');
+  document.getElementById('modal-team').classList.add('open');
+}
+
+function editTeam(id) {
+  ts.editingId = id;
+  document.getElementById('team-modal-title').textContent = '编辑返佣团队';
+  const t = teamData.find(x => x.id === id);
+  if (!t) return;
+  fillTeamForm(t);
+  document.getElementById('tf-type').disabled = true;
+  switchLineTab('co');
+  document.getElementById('modal-team').classList.add('open');
+}
+
+function saveTeam() {
+  const name = document.getElementById('tf-name').value.trim();
+  const type = document.getElementById('tf-type').value;
+  if (!name) return alert('请填写团队名称');
+  if (!type) return alert('请选择团队类型');
+  const lines = {};
+  LINE_DEFS.forEach(d => { lines[d.key] = readLineForm(d.key); });
+  const obj = {
+    id: ts.editingId || nextId(teamData), name, type,
+    depth: parseInt(document.getElementById('tf-depth').value) || 1,
+    requireCard: document.getElementById('tf-requirecard').checked,
+    extraFee: document.getElementById('tf-extrafee').checked,
+    cycle: cycleMap[document.getElementById('tf-cycle').value],
+    status: document.getElementById('tf-status').checked ? 'enabled' : 'disabled',
+    lines,
+    createdBy: ts.editingId ? (teamData.find(x=>x.id===ts.editingId)?.createdBy||'admin') : 'admin',
+    createdAt: ts.editingId ? (teamData.find(x=>x.id===ts.editingId)?.createdAt||now()) : now(),
+    updatedBy: 'admin', updatedAt: now(),
+  };
+  if (ts.editingId) {
+    const idx = teamData.findIndex(x => x.id === ts.editingId);
+    if (idx >= 0) teamData[idx] = obj;
+  } else { teamData.push(obj); }
+  closeTeamModal();
+  filterTeams();
+}
+
+document.getElementById('modal-team').addEventListener('click', function(e) { if (e.target === this) closeTeamModal(); });
+renderTeams();
+</script>
+
+
+</body>
+</html>

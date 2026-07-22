@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>返佣系统后台 - BD管理</title>
+<link rel="stylesheet" href="common.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand"><h1>返佣系统后台</h1><span>Commission Management</span></div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">返佣团队管理</div>
+      <a class="sidebar-item " href="teams.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="6" height="6" rx="1"/><rect x="12" y="5" width="6" height="6" rx="1"/><rect x="2" y="13" width="11" height="6" rx="1"/><rect x="17" y="13" width="1" height="6" rx=".5"/></svg>团队管理</a>
+      <a class="sidebar-item " href="bd-groups.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="7" height="6" rx="1"/><rect x="11" y="3" width="7" height="6" rx="1"/><rect x="2" y="11" width="7" height="6" rx="1"/><rect x="11" y="11" width="7" height="6" rx="1"/></svg>BD组管理</a>
+      <a class="sidebar-item active" href="bd-members.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="3"/><circle cx="14" cy="7" r="3"/><path d="M1 17v-1a4 4 0 014-4h4a4 4 0 014 4v1"/><path d="M12 17v-1a4 4 0 014-4h1"/></svg>BD管理</a>
+      <div class="sidebar-section">代理商管理</div>
+      <a class="sidebar-item " href="agents.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="8" r="4"/><path d="M3 18v-1a5 5 0 015-5h4a5 5 0 015 5v1"/></svg>代理商管理</a>
+      <a class="sidebar-item " href="agent-upline.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 16V4M4 9l6-6 6 6"/></svg>代理商上级查询</a>
+      <a class="sidebar-item " href="agent-downline.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 4v12M4 11l6 6 6-6"/></svg>代理商下级查询</a>
+      <a class="sidebar-item " href="agent-transfer.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h10M10 4l3 3-3 3"/><path d="M17 13H7M10 10l-3 3 3 3"/></svg>代理商迁移</a>
+      <a class="sidebar-item " href="agent-offboard.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="7"/><path d="M7.5 7.5l5 5M12.5 7.5l-5 5"/></svg>代理商清退</a>
+      <a class="sidebar-item " href="agent-demote.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 6l5 5 5-5M5 12l5 5 5-5"/></svg>代理商降级</a>
+    </nav>
+    <div class="sidebar-footer"><div class="avatar">A</div><div class="info">Admin<small>管理员</small></div></div>
+  </aside>
+<div class="main">
+  <div class="breadcrumb"><span>返佣团队管理</span><span class="sep">/</span><strong >BD管理</strong></div>
+  <div class="page-header">
+    <div><h2>BD管理</h2><p>管理BD成员及其返佣授权配置</p></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-primary" onclick="openBDModal()">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4v12M4 10h12"/></svg>新建BD
+      </button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="filter-bar">
+      <div class="search-input"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="5"/><path d="M13 13l4 4"/></svg><input class="form-input" placeholder="搜索BD名称..." id="bf-name-filter"></div>
+      <input class="form-input" placeholder="BD ID" style="width:100px;" id="bf-id-filter">
+      <select class="form-select" style="width:160px;" id="bf-group-filter"><option value="">全部BD组</option></select>
+      <select class="form-select" style="width:150px;" id="bf-type-filter"><option value="">全部团队类型</option><option value="BD--代理商模式">BD--代理商模式</option><option value="BD--地推模式">BD--地推模式</option><option value="卡商--地推模式">卡商--地推模式</option><option value="独立代理商模式">独立代理商模式</option></select>
+      <select class="form-select" style="width:110px;" id="bf-status-filter"><option value="">全部状态</option><option value="启用">启用</option><option value="禁用">禁用</option><option value="离职">离职</option></select>
+      <button class="btn btn-primary" onclick="filterBDs()">查询</button>
+      <button class="btn btn-secondary" onclick="resetBDFilters()">重置</button>
+    </div>
+    <div class="table-wrap"><table id="bd-table"></table></div>
+    <div class="pagination" id="bd-pagination"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-bd">
+  <div class="modal modal-wide">
+    <div class="modal-header"><h3 id="bd-modal-title">新建BD</h3><button class="modal-close" onclick="closeBDModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="section-title">基本信息</div>
+      <div class="form-grid">
+        <div class="full"><div class="form-group"><label class="form-label">UID <span class="req">*</span></label><div style="display:flex;gap:8px;"><input class="form-input" placeholder="请输入用户UID" id="bf-uid" style="flex:1;"><button type="button" class="btn btn-secondary" onclick="checkUID()" id="bf-uid-check-btn">校验</button></div><span class="form-hint" id="bf-uid-hint"></span></div></div>
+        <div class="full"><div class="form-group"><label class="form-label">BD名称 <span class="req">*</span></label><input class="form-input" placeholder="例如：张三" id="bf-name"></div></div>
+        <div><div class="form-group"><label class="form-label">所属团队 <span class="req">*</span></label><select class="form-select" id="bf-team" onchange="onBDTeamChange()"><option value="">请选择</option></select></div></div>
+        <div><div class="form-group"><label class="form-label">所属BD组 <span class="req">*</span></label><select class="form-select" id="bf-group"><option value="">请先选择团队</option></select></div></div>
+        <div><div class="form-group"><label class="form-label">是否为组长</label><select class="form-select" id="bf-leader"><option value="false">否</option><option value="true">是</option></select></div></div>
+        <div><div class="form-group"><label class="form-label">状态 <span class="req">*</span></label><select class="form-select" id="bf-status"><option value="启用">启用</option><option value="禁用">禁用</option><option value="离职">离职</option></select></div></div>
+      </div>
+      <div class="section-title">返佣授权比例</div>
+      <span class="form-hint" style="display:block;margin:-8px 0 16px;">梯度类业务线固定跟随所属团队的梯度，不可单独设置；固定比例业务线可设置自有比例，但不可超过团队授权比例</span>
+      <div id="bf-rate-container"><div class="form-hint">请先选择所属团队</div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeBDModal()">取消</button><button class="btn btn-primary" onclick="saveBD()">保存</button></div>
+  </div>
+</div>
+
+<script src="common.js"></script>
+<script>
+const bs = { data:[], filtered:[], page:1, size:10, sort:'', dir:'asc', editingId:null, uidVerified:false };
+const BD_LINE_DEFS = [ { key:'co', label:'合约' }, { key:'spot', label:'现货' }, { key:'deposit', label:'充值' }, { key:'card', label:'充卡' } ];
+let currentBDLines = {};
+function fmtAmt(n) {
+  n = n || 0;
+  return n.toLocaleString();
+}
+
+function renderBDs() {
+  bs.data = [...bdData]; bs.filtered = [...bdData]; bs.page = 1;
+  updateBDGroupOptions();
+  renderBDTable();
+}
+
+function filterBDs() {
+  const name = (document.getElementById('bf-name-filter')?.value || '').toLowerCase();
+  const id = (document.getElementById('bf-id-filter')?.value || '').trim();
+  const gid = document.getElementById('bf-group-filter')?.value || '';
+  const status = document.getElementById('bf-status-filter')?.value || '';
+  const bfType = document.getElementById('bf-type-filter')?.value || '';
+  bs.filtered = bdData.filter(b => {
+    if (name && !b.name.toLowerCase().includes(name)) return false;
+    if (id && b.id !== parseInt(id)) return false;
+    if (gid && b.groupId !== parseInt(gid)) return false;
+    if (bfType && getBDTeamType(b) !== bfType) return false;
+    if (status && b.status !== status) return false;
+    return true;
+  });
+  bs.page = 1; renderBDTable();
+}
+
+function resetBDFilters() {
+  ['bf-name-filter','bf-id-filter','bf-group-filter','bf-type-filter','bf-status-filter'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  bs.filtered = [...bdData]; bs.page = 1; renderBDTable();
+}
+
+function sortBDs(field) {
+  if (bs.sort === field) { bs.dir = bs.dir === 'asc' ? 'desc' : 'asc'; }
+  else { bs.sort = field; bs.dir = 'asc'; }
+  renderBDTable();
+}
+
+// BD 没有自己的梯度，梯度类业务线直接展示所属团队的梯度（团队变更立即联动）
+function formatTierCell(tiers) {
+  if (!tiers || !tiers.length) return '<span class="form-hint">未设置</span>';
+  var rows = '';
+  for (var i = 0; i < tiers.length; i++) {
+    var t = tiers[i];
+    var prevAmt = i > 0 ? tiers[i-1].amount : 0;
+    var range = t.amount ? (prevAmt ? '$' + (prevAmt>=1e6?(prevAmt/1e6).toFixed(0)+'M':(prevAmt/1e3).toFixed(0)+'K') + ' < ' : '') + '≤$' + (t.amount>=1e6?(t.amount/1e6).toFixed(0)+'M':(t.amount/1e3).toFixed(0)+'K') : '>$' + (prevAmt>=1e6?(prevAmt/1e6).toFixed(0)+'M':(prevAmt/1e3).toFixed(0)+'K');
+    rows += '<div class="tier-popover-row"><span class="tier-amount">' + range + '</span><span class="tier-rate">' + t.rate + '%</span></div>';
+  }
+  return '<span class="tier-badge badge badge-emerald">跟随团队 · ' + tiers.length + '档<div class="tier-popover"><div class="tier-popover-header"><span>累计交易额</span><span>返佣比例</span></div><div class="tier-popover-body">' + rows + '</div></div></span>';
+}
+function bdRateCell(b, key) {
+  var t = getBDTeam(b);
+  var tl = t && t.lines ? t.lines[key] : null;
+  if (!tl || !tl.enabled) return '<span class="form-hint">未启用</span>';
+  if (tl.mode === 'tier') return formatTierCell(tl.tiers);
+  return (b.lines ? b.lines[key] : 0) + '%';
+}
+
+function renderBDTable() {
+  let sorted = [...bs.filtered];
+  if (bs.sort) {
+    sorted.sort((a,b) => {
+      let va = a[bs.sort], vb = b[bs.sort];
+      if (typeof va === 'string') va = va.toLowerCase();
+      if (typeof vb === 'string') vb = vb.toLowerCase();
+      return (va < vb ? -1 : va > vb ? 1 : 0) * (bs.dir === 'asc' ? 1 : -1);
+    });
+  }
+  const total = sorted.length;
+  const pages = Math.max(1, Math.ceil(total / bs.size));
+  if (bs.page > pages) bs.page = pages;
+  const start = (bs.page - 1) * bs.size;
+  const pageData = sorted.slice(start, start + bs.size);
+
+  const th = (label, field) => `<th class="sortable" onclick="sortBDs('${field}')">${label} ${bs.sort===field ? (bs.dir==='asc'?'▲':'▼') : '⇅'}</th>`;
+  const statusBadge = (st) => st==='启用' ? '<span class="badge badge-emerald">启用</span>' : st==='禁用' ? '<span class="badge badge-amber">禁用</span>' : '<span class="badge badge-rose">离职</span>';
+  document.getElementById('bd-table').innerHTML = `
+    <thead><tr>
+      ${th('BD ID','id')}<th>UID</th><th>BD名称</th><th>所属BD组</th><th>所属团队</th><th>团队类型</th><th style="text-align:center">组长</th><th style="text-align:center">状态</th>
+      <th style="text-align:center">合约</th><th style="text-align:center">现货</th><th style="text-align:center">充值</th><th style="text-align:center">充卡</th>
+      <th style="text-align:center">创建人</th><th style="text-align:center">创建时间</th><th style="text-align:center">修改人</th><th style="text-align:center">修改时间</th><th style="text-align:center">操作</th>
+    </tr></thead>
+    <tbody>${pageData.length === 0 ? `<tr><td colspan="17"><div class="empty-state"><svg width="40" height="40" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="3" width="16" height="14" rx="1"/><path d="M6 8h8M6 12h5"/></svg>没有找到匹配的BD</div></td></tr>` : pageData.map(b => {
+      const bdTeamType = getBDTeamType(b);
+      return `<tr>
+        <td style="color:rgba(9,9,11,.40);font-size:12px;">#${b.id}</td>
+        <td style="font-size:13px;">${b.uid||'-'}</td>
+        <td style="font-weight:500;">${b.name}</td>
+        <td><span class="badge badge-indigo">${getGroupName(b.groupId)}</span></td>
+        <td>${getTeamName((groupData.find(function(g){return g.id===b.groupId})||{}).teamId)||'-'}</td>
+        <td>${badge(bdTeamType)}</td>
+        <td style="text-align:center;">${b.isLeader ? '<span class="badge badge-indigo">是</span>' : '<span class="badge badge-slate">否</span>'}</td>
+        <td style="text-align:center;">${statusBadge(b.status)}</td>
+        <td style="text-align:center;font-weight:500;">${bdRateCell(b,'co')}</td>
+        <td style="text-align:center;">${bdRateCell(b,'spot')}</td>
+        <td style="text-align:center;">${bdRateCell(b,'deposit')}</td>
+        <td style="text-align:center;">${bdRateCell(b,'card')}</td>
+        <td style="text-align:center;font-size:13px;">${b.createdBy||'-'}</td>
+        <td style="text-align:center;font-size:12px;color:rgba(9,9,11,.45);">${b.createdAt||'-'}</td>
+        <td style="text-align:center;font-size:13px;">${b.updatedBy||'-'}</td>
+        <td style="text-align:center;font-size:12px;color:rgba(9,9,11,.45);">${b.updatedAt||'-'}</td>
+        <td style="text-align:center;"><a class="link" href="javascript:editBD(${b.id})">编辑</a> &nbsp;<a class="link" href="javascript:copyBD(${b.id})">复制</a></td>
+      </tr>`;
+    }).join('')}</tbody>`;
+
+  document.getElementById('bd-pagination').innerHTML = `
+    <div class="pagination-info">共 <strong>${total}</strong> 个BD &nbsp;|&nbsp; 每页
+      <select class="page-size-select" onchange="bs.size=parseInt(this.value);bs.page=1;renderBDTable()">${[5,10,20,50].map(v => `<option value="${v}" ${bs.size===v?'selected':''}>${v}</option>`).join('')}</select> 条</div>
+    <div class="pagination-btns">
+      <button class="btn btn-secondary btn-sm" onclick="bs.page=1;renderBDTable()" ${bs.page<=1?'disabled':''}>«</button>
+      <button class="btn btn-secondary btn-sm" onclick="bs.page--;renderBDTable()" ${bs.page<=1?'disabled':''}>‹</button>
+      <span style="font-size:13px;padding:0 8px;">第 ${bs.page} / ${pages} 页</span>
+      <button class="btn btn-secondary btn-sm" onclick="bs.page++;renderBDTable()" ${bs.page>=pages?'disabled':''}>›</button>
+      <button class="btn btn-secondary btn-sm" onclick="bs.page=pages;renderBDTable()" ${bs.page>=pages?'disabled':''}>»</button>
+    </div>`;
+}
+
+function onBDTeamChange() {
+  var teamId = document.getElementById('bf-team').value;
+  var sel = document.getElementById('bf-group');
+  currentBDLines = {}; // 手动切换团队时，之前录入的比例不再适用，清空重填
+  if (!teamId) {
+    sel.innerHTML = '<option value="">请先选择团队</option>';
+    renderBDRateSection();
+    return;
+  }
+  var groups = groupData.filter(function(g) { return g.teamId === parseInt(teamId); });
+  sel.innerHTML = '<option value="">请选择BD组</option>' + groups.map(function(g) { return '<option value="' + g.id + '">' + g.name + '</option>'; }).join('');
+  renderBDRateSection();
+}
+
+// 返佣授权比例区块：梯度业务线只读展示团队梯度；固定比例业务线可编辑，上限为团队授权比例
+function renderBDRateSection() {
+  var container = document.getElementById('bf-rate-container');
+  var teamId = document.getElementById('bf-team').value;
+  if (!teamId) { container.innerHTML = '<div class="form-hint">请先选择所属团队</div>'; return; }
+  var t = getTeam(parseInt(teamId));
+  if (!t) { container.innerHTML = '<div class="form-hint">请先选择所属团队</div>'; return; }
+  container.innerHTML = BD_LINE_DEFS.map(function(d) {
+    var tl = (t.lines || {})[d.key] || {};
+    if (!tl.enabled) {
+      return '<div class="form-group" style="margin-bottom:16px;"><label class="form-label" style="color:var(--text-muted);">' + d.label + '返佣</label><span class="form-hint">该团队未启用' + d.label + '返佣，无需设置</span></div>';
+    }
+    if (tl.mode === 'tier') {
+      var rows = (tl.tiers || []).map(function(tier, i) {
+        var lower = i === 0 ? 0 : (tl.tiers[i-1].amount || 0);
+        var isLast = i === tl.tiers.length - 1;
+        var range = i === 0 ? ('≤$' + fmtAmt(tier.amount || 0))
+          : isLast ? ('&gt;$' + fmtAmt(lower))
+          : ('$' + fmtAmt(lower) + ' &lt; ≤$' + fmtAmt(tier.amount || 0));
+        return '<div class="tier-table-row"><span>' + range + '</span><strong>' + tier.rate + '%</strong></div>';
+      }).join('');
+      return '<div style="margin-bottom:16px;"><div class="field-box-title" style="margin-bottom:8px;">' + d.label + '返佣比例（跟随团队梯度，不可修改）</div><div class="tier-table"><div class="tier-table-header"><span>累计交易额</span><span>返佣比例</span></div>' + rows + '</div></div>';
+    }
+    var val = currentBDLines[d.key] || '';
+    return '<div class="form-group" style="margin-bottom:16px;"><label class="form-label">' + d.label + '返佣授权比例</label><span class="form-hint">不可超过团队授权比例 ' + tl.rate + '%</span><div style="display:flex;align-items:center;gap:8px;"><input class="form-input" type="number" min="0" max="' + tl.rate + '" step="0.1" id="bf-rate-' + d.key + '" value="' + val + '" placeholder="' + tl.rate + '" style="max-width:200px;"><span style="color:rgba(9,9,11,.40);font-size:14px;">%</span></div></div>';
+  }).join('');
+}
+
+function openBDModal() {
+  bs.editingId = null;
+  bs.uidVerified = false;
+  document.getElementById('bd-modal-title').textContent = '新建BD';
+  document.getElementById('bf-uid').value = '';
+  document.getElementById('bf-uid').disabled = false;
+  document.getElementById('bf-uid-check-btn').style.display = '';
+  document.getElementById('bf-uid-hint').innerHTML = '';
+  document.getElementById('bf-name').value = '';
+  var teamSel = document.getElementById('bf-team');
+  teamSel.innerHTML = '<option value="">请选择</option>' + teamData.map(function(t) { return '<option value="' + t.id + '">' + t.name + '</option>'; }).join('');
+  teamSel.disabled = false;
+  var sel = document.getElementById('bf-group');
+  sel.innerHTML = '<option value="">请先选择团队</option>';
+  sel.disabled = false;
+  document.getElementById('bf-leader').value = 'false';
+  document.getElementById('bf-status').value = '启用';
+  currentBDLines = {};
+  renderBDRateSection();
+  document.getElementById('modal-bd').classList.add('open');
+}
+
+function closeBDModal() { document.getElementById('modal-bd').classList.remove('open'); }
+
+function checkUID() {
+  var uid = document.getElementById('bf-uid').value.trim();
+  var hint = document.getElementById('bf-uid-hint');
+  var btn = document.getElementById('bf-uid-check-btn');
+  if (!uid) { hint.innerHTML = '<span style="color:#dc2626;">请先输入UID</span>'; bs.uidVerified = false; return; }
+  // Check if editing — allow own UID
+  if (bs.editingId) {
+    var self = bdData.find(function(x) { return x.id === bs.editingId; });
+    if (self && self.uid === uid) { hint.innerHTML = '<span style="color:#16a34a;">✓ 当前BD的UID</span>'; bs.uidVerified = true; return; }
+  }
+  var exists = bdData.some(function(x) { return x.uid === uid; });
+  if (exists) {
+    hint.innerHTML = '<span style="color:#dc2626;">✗ 该UID已是BD，无法重复添加</span>';
+    bs.uidVerified = false;
+  } else {
+    hint.innerHTML = '<span style="color:#16a34a;">✓ 该UID可用</span>';
+    bs.uidVerified = true;
+  }
+}
+
+function copyBD(id) {
+  bs.editingId = null;
+  bs.uidVerified = false;
+  document.getElementById('bd-modal-title').textContent = '新建BD';
+  var b = bdData.find(function(x) { return x.id === id; });
+  if (!b) return;
+  document.getElementById('bf-uid').value = '';
+  document.getElementById('bf-uid').disabled = false;
+  document.getElementById('bf-uid-check-btn').style.display = '';
+  document.getElementById('bf-uid-hint').innerHTML = '<span style="color:#d97706;">请修改UID后重新校验</span>';
+  document.getElementById('bf-name').value = b.name + ' - 副本';
+  // Pre-select team from BD's group
+  var bdGroup = groupData.find(function(g) { return g.id === b.groupId; });
+  var bdTeamId = bdGroup ? bdGroup.teamId : null;
+  var teamSel = document.getElementById('bf-team');
+  teamSel.innerHTML = '<option value="">请选择</option>' + teamData.map(function(t) { return '<option value="' + t.id + '" ' + (t.id===bdTeamId?'selected':'') + '>' + t.name + '</option>'; }).join('');
+  teamSel.disabled = false;
+  // Populate group dropdown filtered by team (without resetting currentBDLines)
+  var sel = document.getElementById('bf-group');
+  if (bdTeamId) {
+    var groups1 = groupData.filter(function(g) { return g.teamId === bdTeamId; });
+    sel.innerHTML = '<option value="">请选择BD组</option>' + groups1.map(function(g) { return '<option value="' + g.id + '">' + g.name + '</option>'; }).join('');
+    sel.value = b.groupId;
+  } else {
+    sel.innerHTML = '<option value="">请先选择团队</option>';
+  }
+  sel.disabled = false;
+  document.getElementById('bf-leader').value = b.isLeader ? 'true' : 'false';
+  document.getElementById('bf-status').value = b.status;
+  currentBDLines = Object.assign({}, b.lines);
+  renderBDRateSection();
+  document.getElementById('modal-bd').classList.add('open');
+}
+
+function editBD(id) {
+  bs.editingId = id;
+  bs.uidVerified = true;
+  document.getElementById('bd-modal-title').textContent = '编辑BD';
+  var b = bdData.find(function(x) { return x.id === id; });
+  if (!b) return;
+  document.getElementById('bf-uid').value = b.uid || '';
+  document.getElementById('bf-uid').disabled = true;
+  document.getElementById('bf-uid-check-btn').style.display = 'none';
+  document.getElementById('bf-uid-hint').innerHTML = '';
+  document.getElementById('bf-name').value = b.name;
+  // Team cascading: find team from BD's group, populate both dropdowns
+  var bdGroup = groupData.find(function(g) { return g.id === b.groupId; });
+  var bdTeamId = bdGroup ? bdGroup.teamId : null;
+  var teamSel = document.getElementById('bf-team');
+  teamSel.innerHTML = '<option value="">请选择</option>' + teamData.map(function(t) { return '<option value="' + t.id + '" ' + (t.id===bdTeamId?'selected':'') + '>' + t.name + '</option>'; }).join('');
+  teamSel.disabled = true;
+  var sel = document.getElementById('bf-group');
+  if (bdTeamId) {
+    var groups = groupData.filter(function(g) { return g.teamId === bdTeamId; });
+    sel.innerHTML = '<option value="">请选择</option>' + groups.map(function(g) { return '<option value="' + g.id + '" ' + (g.id===b.groupId?'selected':'') + '>' + g.name + '</option>'; }).join('');
+  } else {
+    sel.innerHTML = '<option value="">请选择</option>';
+  }
+  sel.disabled = true;
+  document.getElementById('bf-leader').value = b.isLeader ? 'true' : 'false';
+  document.getElementById('bf-status').value = b.status;
+  currentBDLines = Object.assign({}, b.lines);
+  renderBDRateSection();
+  document.getElementById('modal-bd').classList.add('open');
+}
+
+function saveBD() {
+  var uid = document.getElementById('bf-uid').value.trim();
+  var name = document.getElementById('bf-name').value.trim();
+  var teamId = document.getElementById('bf-team').value;
+  var groupId = document.getElementById('bf-group').value;
+  if (!uid) return alert('请填写UID');
+  if (!bs.editingId && !bs.uidVerified) return alert('请先校验UID');
+  if (!name) return alert('请填写BD名称');
+  if (!teamId) return alert('请选择所属团队');
+  if (!groupId) return alert('请选择所属BD组');
+  var t = getTeam(parseInt(teamId));
+  var lines = {};
+  var overLimitMsg = null;
+  BD_LINE_DEFS.forEach(function(d) {
+    var tl = (t && t.lines) ? t.lines[d.key] : null;
+    if (!tl || !tl.enabled || tl.mode === 'tier') { lines[d.key] = 0; return; } // 未启用/梯度线：BD 不持有自有比例
+    var input = document.getElementById('bf-rate-' + d.key);
+    var v = parseFloat(input ? input.value : 0) || 0;
+    if (v > tl.rate) overLimitMsg = d.label + '返佣授权比例不可超过团队授权的 ' + tl.rate + '%';
+    lines[d.key] = v;
+  });
+  if (overLimitMsg) return alert(overLimitMsg);
+  var obj = {
+    id: bs.editingId || nextId(bdData), uid: uid, name: name, groupId: parseInt(groupId),
+    isLeader: document.getElementById('bf-leader').value === 'true',
+    status: document.getElementById('bf-status').value,
+    lines: lines,
+    createdBy: bs.editingId ? (bdData.find(function(x) { return x.id===bs.editingId; })?.createdBy||'admin') : 'admin',
+    createdAt: bs.editingId ? (bdData.find(function(x) { return x.id===bs.editingId; })?.createdAt||now()) : now(),
+    updatedBy: 'admin', updatedAt: now(),
+  };
+  if (bs.editingId) { var idx = bdData.findIndex(function(x) { return x.id === bs.editingId; }); if (idx >= 0) bdData[idx] = obj; }
+  else { bdData.push(obj); }
+  closeBDModal();
+  filterBDs();
+}
+
+document.getElementById('modal-bd').addEventListener('click', function(e) { if (e.target === this) closeBDModal(); });
+renderBDs();
+</script>
+
+</body>
+</html>
