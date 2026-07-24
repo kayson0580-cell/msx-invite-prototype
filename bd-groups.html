@@ -151,7 +151,6 @@ function renderGroupTable() {
     </div>`;
 }
 
-const cardReqLabelMap = { linked: '关联U卡', active: '激活U卡' };
 function lineTooltipHTML(l) {
   let rows = '';
   if (l.mode === 'tier' && l.tiers && l.tiers.length) {
@@ -162,13 +161,18 @@ function lineTooltipHTML(l) {
       return `<div class="hover-tip-row"><span>${range}</span><strong>${t.rate}%</strong></div>`;
     }).join('');
   }
-  if (l.cardReq && l.cardReq !== 'none') {
-    const limitParts = [];
-    if (l.silverLimit) limitParts.push(`银卡≥${l.silverLimit.toLocaleString()}`);
-    if (l.goldLimit) limitParts.push(`金卡≥${l.goldLimit.toLocaleString()}`);
-    if (l.blackLimit) limitParts.push(`黑卡≥${l.blackLimit.toLocaleString()}`);
-    rows += `<div class="hover-tip-row"><span>结算要求</span><strong>${cardReqLabelMap[l.cardReq]||l.cardReq}</strong></div>`;
-    if (limitParts.length) rows += `<div class="hover-tip-row"><span>充值限额</span><strong style="font-weight:500;">${limitParts.join(' / ')}</strong></div>`;
+  if (l.requireActive || l.requireAmount) {
+    const reqParts = [];
+    if (l.requireActive) reqParts.push('必须激活U卡');
+    if (l.requireAmount) reqParts.push('必须充值金额达标');
+    rows += `<div class="hover-tip-row"><span>结算要求</span><strong>${reqParts.join(' / ')}</strong></div>`;
+    if (l.requireAmount) {
+      const limitParts = [];
+      if (l.silverLimit) limitParts.push(`银卡≥${l.silverLimit.toLocaleString()}`);
+      if (l.goldLimit) limitParts.push(`金卡≥${l.goldLimit.toLocaleString()}`);
+      if (l.blackLimit) limitParts.push(`黑卡≥${l.blackLimit.toLocaleString()}`);
+      if (limitParts.length) rows += `<div class="hover-tip-row"><span>充值限额</span><strong style="font-weight:500;">${limitParts.join(' / ')}</strong></div>`;
+    }
   }
   return rows;
 }
@@ -185,7 +189,7 @@ function onGroupTeamChange() {
       <div class="item"><span class="label">返佣深度</span><span class="value">${t.depth} 级</span></div>
       <div class="item"><span class="label">结算周期</span><span class="value">${t.cycle}</span></div>
       <div class="item"><span class="label">状态</span><span class="value">${t.status==='enabled'?'<span class="badge badge-emerald">启用</span>':'<span class="badge badge-slate">停用</span>'}</span></div>
-      <div class="item"><span class="label">强制绑卡</span><span class="value">${t.requireCard?'<span class="badge badge-amber">是</span>':'<span class="badge badge-slate">否</span>'}</span></div>
+      <div class="item"><span class="label">推荐绑卡</span><span class="value">${t.requireCard?'<span class="badge badge-amber">是</span>':'<span class="badge badge-slate">否</span>'}</span></div>
       <div class="item"><span class="label">叠加手续费</span><span class="value">${t.extraFee?'<span class="badge badge-amber">是</span>':'<span class="badge badge-slate">否</span>'}</span></div>
     </div>
     <div class="row rate-row">
@@ -194,7 +198,7 @@ function onGroupTeamChange() {
         const l = (t.lines || {})[k] || {};
         if (!l.enabled) return `<span>${label} <strong>未启用</strong></span>`;
         const val = l.mode === 'tier' ? '阶梯' : l.rate + '%';
-        const hasExtra = l.mode === 'tier' || (l.cardReq && l.cardReq !== 'none');
+        const hasExtra = l.mode === 'tier' || l.requireActive || l.requireAmount;
         if (hasExtra) {
           return `<span>${label} <span class="hover-tip-wrap"><strong>${val}</strong><span class="hover-tip">${lineTooltipHTML(l)}</span></span></span>`;
         }

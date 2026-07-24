@@ -105,7 +105,7 @@
 
       <div class="subsection-label">参与规则</div>
       <div class="form-grid">
-        <div><div class="form-group"><label class="form-label">是否强制绑卡</label><span class="form-hint">开启后需绑定实体卡才能参与返佣</span><div id="tf-requirecard-wrap"></div></div></div>
+        <div><div class="form-group"><label class="form-label">是否推荐绑卡</label><span class="form-hint">开启后向该团队成员推荐绑定实体卡，非强制要求</span><div id="tf-requirecard-wrap"></div></div></div>
         <div><div class="form-group"><label class="form-label">是否收叠加充值手续费</label><span class="form-hint">在链上手续费基础上额外加收</span><div id="tf-extrafee-wrap"></div></div></div>
       </div>
 
@@ -183,13 +183,12 @@ function lineSectionHTML(d, i) {
       </div>
 
       <div class="field-box">
-        <div class="field-box-title">U卡结算要求</div>
+        <div class="field-box-title">返佣结算要求</div>
         <div class="form-grid">
-          <div><div class="form-group"><label class="form-label">${d.label}返佣结算U卡要求</label>
-            <span class="form-hint">启用后需满足对应持卡充值要求才可结算</span>
-            <select class="form-select" id="tf-${d.key}-cardreq" onchange="toggleCardLimits('${d.key}')">
-              <option value="none">不启用</option><option value="linked">关联U卡</option><option value="active">激活U卡</option>
-            </select>
+          <div><div class="form-group"><label class="form-label">${d.label}返佣结算要求</label>
+            <span class="form-hint">勾选后需满足对应条件才可结算</span>
+            <label style="display:flex;align-items:center;gap:8px;margin-top:4px;"><input type="checkbox" id="tf-${d.key}-reqactive" onchange="toggleReqActive('${d.key}')"> 必须激活U卡</label>
+            <label id="tf-${d.key}-reqamount-wrap" style="display:none;align-items:center;gap:8px;margin-top:10px;"><input type="checkbox" id="tf-${d.key}-reqamount" onchange="toggleCardLimits('${d.key}')"> 必须充值金额达标</label>
           </div></div>
         </div>
         <div id="tf-${d.key}-limits" style="display:none;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:22px;">
@@ -236,8 +235,16 @@ function toggleLineFields(key) {
   document.getElementById(`tf-tab-dot-${key}`).classList.toggle('on', on);
   document.getElementById(`tf-${key}-enabled-label`).textContent = on ? '是' : '否';
 }
+function toggleReqActive(key) {
+  const active = document.getElementById(`tf-${key}-reqactive`).checked;
+  document.getElementById(`tf-${key}-reqamount-wrap`).style.display = active ? 'flex' : 'none';
+  if (!active) {
+    document.getElementById(`tf-${key}-reqamount`).checked = false;
+    document.getElementById(`tf-${key}-limits`).style.display = 'none';
+  }
+}
 function toggleCardLimits(key) {
-  const show = document.getElementById(`tf-${key}-cardreq`).value !== 'none';
+  const show = document.getElementById(`tf-${key}-reqamount`).checked;
   document.getElementById(`tf-${key}-limits`).style.display = show ? 'grid' : 'none';
 }
 function toggleLineMode(key) {
@@ -285,7 +292,9 @@ function removeTeamTier(key, i) {
 // ── 读取 / 写入某条业务线的表单值 ──
 function fillLineForm(key, line) {
   document.getElementById(`tf-${key}-enabled`).checked = !!line.enabled;
-  document.getElementById(`tf-${key}-cardreq`).value = line.cardReq || 'none';
+  document.getElementById(`tf-${key}-reqactive`).checked = !!line.requireActive;
+  toggleReqActive(key);
+  document.getElementById(`tf-${key}-reqamount`).checked = !!line.requireAmount;
   document.getElementById(`tf-${key}-silver`).value = line.silverLimit || '';
   document.getElementById(`tf-${key}-gold`).value = line.goldLimit || '';
   document.getElementById(`tf-${key}-black`).value = line.blackLimit || '';
@@ -299,7 +308,8 @@ function fillLineForm(key, line) {
 function readLineForm(key) {
   const line = {
     enabled: document.getElementById(`tf-${key}-enabled`).checked,
-    cardReq: document.getElementById(`tf-${key}-cardreq`).value,
+    requireActive: document.getElementById(`tf-${key}-reqactive`).checked,
+    requireAmount: document.getElementById(`tf-${key}-reqamount`).checked,
     silverLimit: parseFloat(document.getElementById(`tf-${key}-silver`).value) || 0,
     goldLimit: parseFloat(document.getElementById(`tf-${key}-gold`).value) || 0,
     blackLimit: parseFloat(document.getElementById(`tf-${key}-black`).value) || 0,
@@ -376,7 +386,7 @@ function renderTeamTable() {
   document.getElementById('team-table').innerHTML = `
     <thead><tr>
       ${th('团队ID','id')}<th>团队名称</th><th>团队类型</th><th style="text-align:center">返佣深度</th>
-      <th style="text-align:center">强制绑卡</th><th style="text-align:center">叠加手续费</th>
+      <th style="text-align:center">推荐绑卡</th><th style="text-align:center">叠加手续费</th>
       <th>已启用业务线</th>
       ${th('结算周期','cycle')}<th style="text-align:center">状态</th><th style="text-align:center">创建人</th><th style="text-align:center">修改人</th><th style="text-align:center">创建时间</th><th style="text-align:center">修改时间</th><th style="text-align:center">操作</th>
     </tr></thead>

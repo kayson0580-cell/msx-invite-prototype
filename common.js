@@ -17,42 +17,43 @@ const cycleMap = { daily:'日结算', weekly:'周结算', monthly:'月结算' };
 const revCycleMap = { '日结算':'daily', '周结算':'weekly', '月结算':'monthly' };
 
 // 团队返佣业务线字段形状：
-// { enabled, cardReq:'none'|'linked'|'active', silverLimit, goldLimit, blackLimit, mode:'flat'|'tier', rate, tiers:[{amount,rate}] }
+// { enabled, requireActive, requireAmount, silverLimit, goldLimit, blackLimit, mode:'flat'|'tier', rate, tiers:[{amount,rate}] }
+// requireAmount 仅在 requireActive 为 true 时才可能为 true（表单上二者联动）
 function emptyTeamLine(extra) {
-  return Object.assign({ enabled:false, cardReq:'none', silverLimit:0, goldLimit:0, blackLimit:0, mode:'flat', rate:0, tiers:[] }, extra || {});
+  return Object.assign({ enabled:false, requireActive:false, requireAmount:false, silverLimit:0, goldLimit:0, blackLimit:0, mode:'flat', rate:0, tiers:[] }, extra || {});
 }
 
 let teamData = [
   { id:1, name:'华北BD团队', type:'BD--代理商模式', depth:3, requireCard:false, extraFee:false, cycle:'日结算', status:'enabled',
     lines: {
-      co: emptyTeamLine({ enabled:true, cardReq:'none', mode:'flat', rate:80 }),
-      spot: emptyTeamLine({ enabled:true, cardReq:'none', mode:'flat', rate:60 }),
+      co: emptyTeamLine({ enabled:true, mode:'flat', rate:80 }),
+      spot: emptyTeamLine({ enabled:true, mode:'flat', rate:60 }),
       deposit: emptyTeamLine({ enabled:false }),
       card: emptyTeamLine({ enabled:false }),
     },
     createdBy:'admin', createdAt:'2026-01-15 09:30', updatedBy:'admin', updatedAt:'2026-06-20 14:22' },
   { id:2, name:'华南BD团队', type:'BD--代理商模式', depth:3, requireCard:false, extraFee:false, cycle:'日结算', status:'enabled',
     lines: {
-      co: emptyTeamLine({ enabled:true, cardReq:'none', mode:'flat', rate:75 }),
-      spot: emptyTeamLine({ enabled:true, cardReq:'none', mode:'flat', rate:55 }),
+      co: emptyTeamLine({ enabled:true, mode:'flat', rate:75 }),
+      spot: emptyTeamLine({ enabled:true, mode:'flat', rate:55 }),
       deposit: emptyTeamLine({ enabled:false }),
       card: emptyTeamLine({ enabled:false }),
     },
     createdBy:'admin', createdAt:'2026-02-03 10:15', updatedBy:'李主管', updatedAt:'2026-07-01 16:45' },
   { id:3, name:'卡商渠道组', type:'卡商--地推模式', depth:5, requireCard:true, extraFee:true, cycle:'周结算', status:'enabled',
     lines: {
-      co: emptyTeamLine({ enabled:true, cardReq:'active', silverLimit:200, goldLimit:800, blackLimit:2500, mode:'tier',
+      co: emptyTeamLine({ enabled:true, requireActive:true, requireAmount:true, silverLimit:200, goldLimit:800, blackLimit:2500, mode:'tier',
         tiers:[{amount:50000000,rate:20},{amount:200000000,rate:25},{amount:500000000,rate:30},{amount:1000000000,rate:35},{amount:0,rate:40}] }),
-      spot: emptyTeamLine({ enabled:true, cardReq:'active', silverLimit:200, goldLimit:800, blackLimit:2500, mode:'tier',
+      spot: emptyTeamLine({ enabled:true, requireActive:true, requireAmount:true, silverLimit:200, goldLimit:800, blackLimit:2500, mode:'tier',
         tiers:[{amount:2000000,rate:20},{amount:5000000,rate:25},{amount:14000000,rate:30},{amount:40000000,rate:35},{amount:0,rate:40}] }),
-      deposit: emptyTeamLine({ enabled:true, cardReq:'linked', silverLimit:200, goldLimit:800, blackLimit:2500, mode:'flat', rate:0.8 }),
-      card: emptyTeamLine({ enabled:true, cardReq:'none', mode:'flat', rate:0.8 }),
+      deposit: emptyTeamLine({ enabled:true, requireActive:true, requireAmount:true, silverLimit:200, goldLimit:800, blackLimit:2500, mode:'flat', rate:0.8 }),
+      card: emptyTeamLine({ enabled:true, mode:'flat', rate:0.8 }),
     },
     createdBy:'张经理', createdAt:'2026-03-10 14:00', updatedBy:'张经理', updatedAt:'2026-06-28 11:30' },
   { id:6, name:'旧华东BD组', type:'BD--地推模式', depth:2, requireCard:false, extraFee:false, cycle:'周结算', status:'disabled',
     lines: {
-      co: emptyTeamLine({ enabled:true, cardReq:'none', mode:'flat', rate:70 }),
-      spot: emptyTeamLine({ enabled:true, cardReq:'none', mode:'flat', rate:50 }),
+      co: emptyTeamLine({ enabled:true, mode:'flat', rate:70 }),
+      spot: emptyTeamLine({ enabled:true, mode:'flat', rate:50 }),
       deposit: emptyTeamLine({ enabled:false }),
       card: emptyTeamLine({ enabled:false }),
     },
