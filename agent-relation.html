@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>返佣系统后台 - 返佣关系查询</title>
+<link rel="stylesheet" href="common.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-brand"><h1>返佣系统后台</h1><span>Commission Management</span></div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">返佣团队管理</div>
+      <a class="sidebar-item " href="teams.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="6" height="6" rx="1"/><rect x="12" y="5" width="6" height="6" rx="1"/><rect x="2" y="13" width="11" height="6" rx="1"/><rect x="17" y="13" width="1" height="6" rx=".5"/></svg>团队管理</a>
+      <a class="sidebar-item " href="bd-groups.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="7" height="6" rx="1"/><rect x="11" y="3" width="7" height="6" rx="1"/><rect x="2" y="11" width="7" height="6" rx="1"/><rect x="11" y="11" width="7" height="6" rx="1"/></svg>BD组管理</a>
+      <a class="sidebar-item " href="bd-members.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="3"/><circle cx="14" cy="7" r="3"/><path d="M1 17v-1a4 4 0 014-4h4a4 4 0 014 4v1"/><path d="M12 17v-1a4 4 0 014-4h1"/></svg>BD管理</a>
+      <div class="sidebar-section">代理商管理</div>
+      <a class="sidebar-item " href="agents.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="8" r="4"/><path d="M3 18v-1a5 5 0 015-5h4a5 5 0 015 5v1"/></svg>代理商管理</a>
+      <a class="sidebar-item active" href="agent-relation.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="10" r="3"/><circle cx="14" cy="10" r="3"/><path d="M9 10h2"/></svg>返佣关系查询</a>
+      <a class="sidebar-item " href="agent-change.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10a7 7 0 0112-4.9M17 10a7 7 0 01-12 4.9"/><path d="M15 3v3h-3M5 17v-3h3"/></svg>代理商变更</a>
+    </nav>
+    <div class="sidebar-footer"><div class="avatar">A</div><div class="info">Admin<small>管理员</small></div></div>
+  </aside>
+<div class="main">
+  <div class="breadcrumb"><span>代理商管理</span><span class="sep">/</span><strong >返佣关系查询</strong></div>
+  <div class="page-header">
+    <div><h2>返佣关系查询</h2><p>查询指定用户的上下级返佣关系</p></div>
+  </div>
+  <div class="card" style="margin-bottom:16px;">
+    <div class="filter-bar">
+      <div class="combo-input">
+        <select class="combo-select" id="rf-user-type" onchange="updateRelationUserPlaceholder()">
+          <option value="uid">用户ID</option>
+          <option value="email">用户邮箱</option>
+          <option value="wallet">钱包地址</option>
+        </select>
+        <input class="combo-text" placeholder="请输入用户ID" id="rf-user-filter" value="MSX80234517">
+        <button class="combo-clear" onclick="clearRelationUserInput()" title="清空">
+          <svg width="10" height="10" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 5l10 10M15 5L5 15"/></svg>
+        </button>
+      </div>
+      <button class="btn btn-primary" onclick="queryRelation()">查询</button>
+      <button class="btn btn-secondary" onclick="resetRelationFilter()">重置</button>
+      <button class="btn btn-secondary" style="margin-left:auto;" onclick="openExportModal()">
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3v10M6 9l4 4 4-4"/><path d="M4 16v1a2 2 0 002 2h8a2 2 0 002-2v-1"/></svg>导出全部数据
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:12px;padding:16px 20px;">
+      <div class="segmented-tabs" id="rf-group-tabs">
+        <button type="button" class="segmented-tab" onclick="setRelationGroup(this,'up')">上级</button>
+        <button type="button" class="segmented-tab active" onclick="setRelationGroup(this,'down')">下级</button>
+      </div>
+      <div class="segmented-tabs" id="rf-data-type-tabs">
+        <button type="button" class="segmented-tab active" onclick="setRelationDataType(this,'invite')">邀请关系</button>
+        <button type="button" class="segmented-tab" onclick="setRelationDataType(this,'profile')">基础数据</button>
+        <button type="button" class="segmented-tab" onclick="setRelationDataType(this,'userdata')">交易数据</button>
+        <button type="button" class="segmented-tab" onclick="setRelationDataType(this,'commission')">返佣数据</button>
+      </div>
+    </div>
+    <div id="relation-result">
+      <div class="empty-state" style="padding:56px 24px;">
+        <svg width="40" height="40" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="3" width="16" height="14" rx="1"/><path d="M6 8h8M6 12h5"/></svg>
+        请输入用户UID、用户邮箱或用户钱包地址进行查询
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-export">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>导出数据</h3>
+      <button class="modal-close" onclick="closeExportModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:12px;" onclick="confirmExportData()">确认导出</button>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">点击上方按钮提交数据导出任务，每半小时最多可提交5次</p>
+      <div class="table-wrap"><table id="export-task-table"></table></div>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:16px;">仅保留7天内提交的最近5条记录，您可下载已生成的数据</p>
+    </div>
+  </div>
+</div>
+
+<script src="common.js"></script>
+<script>
+const relationUserPlaceholders = { uid: '请输入用户ID', email: '请输入用户邮箱', wallet: '请输入钱包地址' };
+
+function updateRelationUserPlaceholder() {
+  const type = document.getElementById('rf-user-type').value;
+  document.getElementById('rf-user-filter').placeholder = relationUserPlaceholders[type] || '';
+}
+
+function clearRelationUserInput() {
+  document.getElementById('rf-user-filter').value = '';
+  document.getElementById('rf-user-filter').focus();
+}
+
+const relationColumns = {
+  profile: ['用户','注册时间','是否KYC','来源','首充时间','首次交易时间','首次充卡时间','合约返佣比例｜合约返利比例','现货返佣比例｜现货返利比例','充值返佣比例｜充值返利比例','充卡返佣比例｜充卡返利比例'],
+  invite: ['用户','邀请码','身份类型','邀请层级','直接上级','返佣链路','直代人数','直客人数','伞下总人数','下级深度'],
+  userdata: ['用户','合约交易额','现货交易额','充值额','充卡额','合约手续费','现货手续费','充值手续费','充卡手续费','充值总额','提现总额','净提现'],
+  commission: ['用户','合约返佣','现货返佣','充值返佣','充卡返佣','返佣总额','返佣提现总额'],
+};
+
+const relationUserContacts = {
+  'MSX90011001': { email: 'hq***msx.com', wallet: '0x0001Ab...F001' },
+  'MSX90011002': { email: 'ceo***msx.com', wallet: '0x0002Ab...F002' },
+  'MSX10000001': { email: 'zhao***vip@qq.com', wallet: '0x1122Ab...9F00' },
+  'MSX80234517': { email: 'zhang***iao@gmail.com', wallet: '0x8f3aE2...C21b' },
+  'MSX71328841': { email: 'liu***fang@outlook.com', wallet: '0x1a2Bd4...9F0e' },
+  'MSX40921358': { email: 'chen***wei@163.com', wallet: '0x5cD91f...7A3c' },
+};
+
+const relationRecords = {};
+function addRelationRecord(rec) { relationRecords[rec.uid] = rec; }
+
+addRelationRecord({ uid:'MSX90011001', regTime:'2025/01/01 00:00', kyc:'已认证', source:'msx.com', co:50, spot:50, dep:50, card:50,
+  firstDeposit:'2025/01/02 09:00', firstTrade:'2025/01/02 10:00', firstCard:null,
+  futures:1000000, spotAmt:500000, depositAmt:200000, cardAmt:null, futuresFee:1700.00, spotFee:1000.00, depositFee:300.00, cardFee:null,
+  depositTotal:260000, withdrawTotal:150000,
+  rCo:500.00, rSpot:300.00, rDep:400.00, rCard:null, rTotal:1200.00,
+  inviteCode:'ROOT01', identity:'总部', level:1, parent:null, relType:'上级' });
+
+addRelationRecord({ uid:'MSX90011002', regTime:'2025/03/15 09:20', kyc:'已认证', source:'msx.com', co:40, spot:40, dep:40, card:40,
+  firstDeposit:'2025/03/16 10:10', firstTrade:'2025/03/16 11:00', firstCard:'2025/03/18 09:00',
+  futures:400000, spotAmt:200000, depositAmt:80000, cardAmt:20000, futuresFee:680.00, spotFee:400.00, depositFee:120.00, cardFee:200.00,
+  depositTotal:100000, withdrawTotal:60000,
+  rCo:200.00, rSpot:120.00, rDep:160.00, rCard:60.00, rTotal:540.00,
+  inviteCode:'8HGT2', identity:'总代', level:2, parent:'MSX90011001', relType:'上级' });
+
+addRelationRecord({ uid:'MSX10000001', regTime:'2025/08/10 11:00', kyc:'已认证', source:'msx.com', co:35, spot:35, dep:35, card:35,
+  firstDeposit:'2025/08/11 08:30', firstTrade:'2025/08/11 09:15', firstCard:'2025/08/13 14:00',
+  futures:150000, spotAmt:80000, depositAmt:30000, cardAmt:8000, futuresFee:255.00, spotFee:160.00, depositFee:45.00, cardFee:80.00,
+  depositTotal:38000, withdrawTotal:22000,
+  rCo:75.00, rSpot:48.00, rDep:60.00, rCard:24.00, rTotal:207.00,
+  inviteCode:'5ZRYI0', identity:'总代', level:3, parent:'MSX90011002', relType:'上级' });
+
+addRelationRecord({ uid:'MSX80234517', regTime:'2026/06/18 14:22', kyc:'已认证', source:'msx.com', co:30, spot:30, dep:30, card:30,
+  firstDeposit:'2026/06/19 10:05', firstTrade:'2026/06/19 15:40', firstCard:'2026/06/22 09:12',
+  futures:186400, spotAmt:92600, depositAmt:12800, cardAmt:3200, futuresFee:310.33, spotFee:186.20, depositFee:19.20, cardFee:31.03,
+  depositTotal:18500, withdrawTotal:11200,
+  rCo:93.10, rSpot:55.86, rDep:27.93, rCard:9.31, rTotal:186.20,
+  inviteCode:'5ZRYI', identity:'代理商', level:4, parent:'MSX10000001', relType:'上级' });
+
+addRelationRecord({ uid:'MSX71328841', regTime:'2026/06/25 18:03', kyc:'未认证', source:'msx app', co:15, spot:15, dep:10, card:10,
+  firstDeposit:'2026/06/26 09:47', firstTrade:'2026/06/27 11:20', firstCard:null,
+  futures:58200, spotAmt:31400, depositAmt:4100, cardAmt:null, futuresFee:169.20, spotFee:84.60, depositFee:6.15, cardFee:null,
+  depositTotal:6200, withdrawTotal:6800,
+  rCo:25.38, rSpot:12.69, rDep:4.23, rCard:null, rTotal:42.30,
+  inviteCode:'8ZK2Q', identity:'普通用户', level:2, parent:'MSX80234517', relType:'下级' });
+
+addRelationRecord({ uid:'MSX40921358', regTime:'2026/07/02 11:15', kyc:'已认证', source:'x.msx.com', co:30, spot:30, dep:30, card:30,
+  firstDeposit:'2026/07/03 07:52', firstTrade:'2026/07/03 12:18', firstCard:'2026/07/05 16:40',
+  futures:312600, spotAmt:167800, depositAmt:18400, cardAmt:5600, futuresFee:448.17, spotFee:268.90, depositFee:27.60, cardFee:56.02,
+  depositTotal:24700, withdrawTotal:19900,
+  rCo:149.80, rSpot:83.90, rDep:27.60, rCard:8.40, rTotal:269.70,
+  inviteCode:'5ZRYI', identity:'普通用户', level:3, parent:'MSX71328841', relType:'下级' });
+
+(function generateMoreRelationUsers() {
+  const sources = ['msx.com', 'msx app', 'x.msx.com'];
+  const kycOptions = ['已认证', '未认证'];
+  const inviteCodes = ['5ZRYI', '8ZK2Q', 'F5CBQ', '9QLMX'];
+  const basePool = ['MSX80234517', 'MSX71328841', 'MSX40921358'];
+  const firstWaveUids = [];
+  const pad2 = n => String(n).padStart(2, '0');
+
+  for (let i = 1; i <= 17; i++) {
+    const uid = 'MSX' + (60000000 + i * 731907).toString().padStart(8, '0');
+    const parent = i <= 9 ? basePool[(i - 1) % basePool.length] : firstWaveUids[(i - 10) % firstWaveUids.length];
+    const level = relationRecords[parent].level + 1;
+    const identity = i % 5 === 0 ? '代理商' : '普通用户';
+    if (i <= 9) firstWaveUids.push(uid);
+
+    const day = (i % 27) + 1, month = 6 + (i % 2), hh = 8 + (i % 12), mm = (i * 7) % 60;
+    const regTime = `2026/${pad2(month)}/${pad2(day)} ${pad2(hh)}:${pad2(mm)}`;
+    const futures = 30000 + i * 12345, spotAmt = 15000 + i * 6234, depositAmt = 2000 + i * 511;
+    const cardAmt = i % 3 === 0 ? null : 300 + i * 47;
+    const rCo = +(futures * 0.0005).toFixed(2), rSpot = +(spotAmt * 0.0006).toFixed(2), rDep = +(depositAmt * 0.002).toFixed(2);
+    const rCard = cardAmt == null ? null : +(cardAmt * 0.03).toFixed(2);
+    const depositTotal = Math.round(depositAmt * 1.4);
+    const withdrawTotal = Math.round(depositTotal * (0.5 + (i % 6) * 0.1));
+
+    addRelationRecord({
+      uid, regTime, kyc: kycOptions[i % 2], source: sources[i % 3],
+      co: 10 + (i % 4) * 5, spot: 10 + (i % 3) * 5, dep: 5 + (i % 3) * 5, card: 5 + (i % 2) * 5,
+      firstDeposit: regTime,
+      firstTrade: `2026/${pad2(month)}/${pad2(day)} ${pad2((hh + 2) % 24)}:${pad2((mm + 15) % 60)}`,
+      firstCard: i % 4 === 0 ? null : `2026/${pad2(month)}/${pad2((day % 27) + 1)} ${pad2((hh + 5) % 24)}:${pad2((mm + 30) % 60)}`,
+      futures, spotAmt, depositAmt, cardAmt,
+      futuresFee: +(futures * 0.0017).toFixed(2), spotFee: +(spotAmt * 0.002).toFixed(2), depositFee: +(depositAmt * 0.0015).toFixed(2), cardFee: cardAmt == null ? null : +(cardAmt * 0.01).toFixed(2),
+      depositTotal, withdrawTotal,
+      rCo, rSpot, rDep, rCard, rTotal: +(rCo + rSpot + rDep + (rCard || 0)).toFixed(2),
+      inviteCode: inviteCodes[i % 4], identity, level, parent, relType: '下级',
+    });
+
+    relationUserContacts[uid] = { email: `user${i}***@mail.com`, wallet: `0x${(1000 + i).toString(16)}...${(9000 + i).toString(16)}` };
+  }
+})();
+
+function buildRelationChain(uid) {
+  const rec = relationRecords[uid];
+  if (!rec || !rec.parent) return uid;
+  const parentChain = relationRecords[rec.parent] ? buildRelationChain(rec.parent) : rec.parent;
+  return parentChain + ' → ' + uid;
+}
+
+(function computeRelationTreeStats() {
+  const childrenOf = {};
+  Object.values(relationRecords).forEach(u => {
+    (childrenOf[u.parent] = childrenOf[u.parent] || []).push(u.uid);
+  });
+  function countDescendants(uid) {
+    return (childrenOf[uid] || []).reduce((sum, c) => sum + 1 + countDescendants(c), 0);
+  }
+  function maxDepth(uid) {
+    const kids = childrenOf[uid] || [];
+    return kids.length ? 1 + Math.max(...kids.map(maxDepth)) : 0;
+  }
+  Object.values(relationRecords).forEach(u => {
+    const kids = childrenOf[u.uid] || [];
+    u.directAgents = kids.filter(c => relationRecords[c].identity === '代理商').length;
+    u.directCustomers = kids.filter(c => relationRecords[c].identity === '普通用户').length;
+    u.totalDown = countDescendants(u.uid);
+    u.depth = maxDepth(u.uid);
+  });
+})();
+
+const relationTypeByUid = {};
+Object.values(relationRecords).forEach(u => { relationTypeByUid[u.uid] = u.relType; });
+
+const fmtRelPct = v => `${v}%｜${v}%`;
+const fmtRelMoney = n => n == null ? '—' : '$' + n.toLocaleString();
+const fmtRelFee = n => n == null ? '—' : '$' + n.toFixed(2);
+const fmtRelSigned = n => n == null ? '—' : (n >= 0 ? '+' : '-') + '$' + Math.abs(n).toLocaleString();
+
+const relationSampleRows = {
+  profile: Object.values(relationRecords).map(u => [
+    u.uid, u.regTime, u.kyc, u.source,
+    u.firstDeposit || '—', u.firstTrade || '—', u.firstCard || '—',
+    fmtRelPct(u.co), fmtRelPct(u.spot), fmtRelPct(u.dep), fmtRelPct(u.card),
+  ]),
+  invite: Object.values(relationRecords).map(u => [
+    u.uid, u.inviteCode, u.identity, u.level + '级', u.parent || '—', buildRelationChain(u.uid),
+    u.directAgents, u.directCustomers, u.totalDown, u.depth + '级',
+  ]),
+  userdata: Object.values(relationRecords).map(u => [
+    u.uid, fmtRelMoney(u.futures), fmtRelMoney(u.spotAmt), fmtRelMoney(u.depositAmt), fmtRelMoney(u.cardAmt),
+    fmtRelFee(u.futuresFee), fmtRelFee(u.spotFee), fmtRelFee(u.depositFee), fmtRelFee(u.cardFee),
+    fmtRelMoney(u.depositTotal), fmtRelMoney(u.withdrawTotal), fmtRelSigned(u.withdrawTotal - u.depositTotal),
+  ]),
+  commission: Object.values(relationRecords).map(u => [
+    u.uid, fmtRelFee(u.rCo), fmtRelFee(u.rSpot), fmtRelFee(u.rDep), fmtRelFee(u.rCard), fmtRelFee(u.rTotal), fmtRelFee(u.rTotal),
+  ]),
+};
+
+let relationDataType = 'invite';
+
+function setRelationDataType(btn, value) {
+  relationDataType = value;
+  document.querySelectorAll('#rf-data-type-tabs .segmented-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  relationSort = { index: null, dir: 'asc' };
+  renderRelationTable();
+}
+
+const relationSortableCols = { userdata: [1,2,3,4,5,6,7,8,9,10,11], commission: [1,2,3,4,5] };
+let relationSort = { index: null, dir: 'asc' };
+
+function parseRelationValue(v) {
+  if (v === '—' || v == null) return -Infinity;
+  const n = parseFloat(String(v).replace(/[^0-9.\-]/g, ''));
+  return isNaN(n) ? -Infinity : n;
+}
+
+function sortRelationTable(index) {
+  if (relationSort.index === index) {
+    relationSort.dir = relationSort.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    relationSort = { index, dir: 'asc' };
+  }
+  renderRelationTable();
+}
+
+function copyRelationUid(uid, btn) {
+  const done = () => {
+    const original = btn.innerHTML;
+    btn.classList.add('copied');
+    btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10l4 4 8-8"/></svg>';
+    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = original; }, 1200);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(uid).then(done).catch(done);
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = uid; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    done();
+  }
+}
+
+let relationGroup = 'down';
+
+function setRelationGroup(btn, key) {
+  relationGroup = key;
+  document.querySelectorAll('#rf-group-tabs .segmented-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderRelationTable();
+}
+
+function collapseRelationChain(full) {
+  const parts = full.split(' → ');
+  if (parts.length <= 2) return null;
+  return parts[0] + ' → ... → ' + parts[parts.length - 1];
+}
+
+function renderRelationUidCell(uid) {
+  const contact = relationUserContacts[uid] || {};
+  const tip = `邮箱：${contact.email || '-'} ｜ 钱包：${contact.wallet || '-'}`;
+  return `<span style="display:inline-flex;align-items:center;gap:6px;">
+    <span class="hint-label" data-tip="${tip}" style="font-weight:500;">${uid}</span>
+    <button type="button" class="copy-btn" onclick="copyRelationUid('${uid}', this)" title="复制用户ID">
+      <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M4.5 13.5V5.5a2 2 0 012-2H14"/></svg>
+    </button>
+  </span>`;
+}
+
+function renderRelationRows(rows) {
+  return rows.map(r => {
+    const uid = r[0];
+    const restCells = r.slice(1).map((v, i) => {
+      if (relationDataType === 'invite' && i === 3) {
+        return `<td>${v === '—' ? v : renderRelationUidCell(v)}</td>`;
+      }
+      if (relationDataType === 'invite' && i === 4) {
+        const short = collapseRelationChain(v);
+        if (!short) return `<td>${v}</td>`;
+        return `<td><span class="hint-label" data-tip="${v}">${short}</span></td>`;
+      }
+      return `<td>${v}</td>`;
+    }).join('');
+    return `<tr><td>${renderRelationUidCell(uid)}</td>${restCells}</tr>`;
+  }).join('');
+}
+
+function renderRelationTable() {
+  const cols = relationColumns[relationDataType];
+  const sortableCols = relationSortableCols[relationDataType] || [];
+  let rows = [...relationSampleRows[relationDataType]];
+  if (relationSort.index !== null && sortableCols.includes(relationSort.index)) {
+    const idx = relationSort.index, dir = relationSort.dir === 'asc' ? 1 : -1;
+    rows.sort((a, b) => (parseRelationValue(a[idx]) - parseRelationValue(b[idx])) * dir);
+  }
+  const headerHtml = cols.map((c, i) => {
+    const label = c.split('｜').join('<br>');
+    if (!sortableCols.includes(i)) return `<th>${label}</th>`;
+    const arrow = relationSort.index === i ? (relationSort.dir === 'asc' ? '▲' : '▼') : '⇅';
+    return `<th class="sortable" onclick="sortRelationTable(${i})">${label} ${arrow}</th>`;
+  }).join('');
+
+  const groupLabel = relationGroup === 'up' ? '上级' : '下级';
+  const groupRows = rows.filter(r => relationTypeByUid[r[0]] === groupLabel);
+
+  document.getElementById('relation-result').innerHTML = !groupRows.length ? `
+    <div class="empty-state" style="padding:56px 24px;">
+      <svg width="40" height="40" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="3" width="16" height="14" rx="1"/><path d="M6 8h8M6 12h5"/></svg>
+      没有找到匹配的用户
+    </div>` : `
+    <div class="table-wrap"><table>
+      <thead><tr>${headerHtml}</tr></thead>
+      <tbody>${renderRelationRows(groupRows)}</tbody>
+    </table></div>`;
+}
+
+function buildRelationExportCsv() {
+  const csvEscape = v => `"${String(v).replace(/"/g, '""')}"`;
+  const sections = [];
+  Object.keys(relationColumns).forEach(type => {
+    const cols = relationColumns[type].map(c => c.split('｜').join(' / '));
+    const rows = relationSampleRows[type].map(r => [...r, relationTypeByUid[r[0]] || '-']);
+    const header = [...cols, '关系类型'].map(csvEscape).join(',');
+    const lines = rows.map(r => r.map(csvEscape).join(','));
+    sections.push(`【${type}】\n${header}\n${lines.join('\n')}`);
+  });
+  return sections.join('\n\n');
+}
+
+function downloadCsvString(csv, filename) {
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function fmtExportTime(d) {
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+let exportTasks = [];
+
+function openExportModal() {
+  renderExportTasks();
+  document.getElementById('modal-export').classList.add('open');
+}
+
+function closeExportModal() {
+  document.getElementById('modal-export').classList.remove('open');
+}
+
+document.getElementById('modal-export').addEventListener('click', function(e) {
+  if (e.target === this) closeExportModal();
+});
+
+function confirmExportData() {
+  const now = new Date();
+  const recentCount = exportTasks.filter(t => now - t.createdAt < 30 * 60 * 1000).length;
+  if (recentCount >= 5) { alert('每半小时最多可提交5次导出任务，请稍后再试'); return; }
+  const task = { createdAt: now, timeLabel: fmtExportTime(now), status: 'generating', csv: null };
+  exportTasks.unshift(task);
+  exportTasks = exportTasks.slice(0, 5);
+  renderExportTasks();
+  setTimeout(() => {
+    task.status = 'done';
+    task.csv = buildRelationExportCsv();
+    renderExportTasks();
+  }, 1800);
+}
+
+function downloadExportTask(i) {
+  const task = exportTasks[i];
+  if (!task || task.status !== 'done') return;
+  downloadCsvString(task.csv, '返佣关系查询_全部数据.csv');
+}
+
+function renderExportTasks() {
+  const table = document.getElementById('export-task-table');
+  if (!exportTasks.length) {
+    table.innerHTML = `<tbody><tr><td style="padding:24px 0;text-align:center;color:var(--text-muted);">暂无导出记录</td></tr></tbody>`;
+    return;
+  }
+  table.innerHTML = `
+    <thead><tr><th>提交时间</th><th>状态</th><th>操作</th></tr></thead>
+    <tbody>${exportTasks.map((t, i) => `
+      <tr>
+        <td>${t.timeLabel}</td>
+        <td>${t.status === 'generating' ? '生成中' : '已生成'}</td>
+        <td>${t.status === 'done' ? `<a class="link" onclick="downloadExportTask(${i})">下载</a>` : '—'}</td>
+      </tr>`).join('')}</tbody>`;
+}
+
+function queryRelation() {
+  const kw = (document.getElementById('rf-user-filter')?.value || '').trim();
+  if (!kw) { alert('请输入用户ID、邮箱或钱包地址'); return; }
+  renderRelationTable();
+}
+
+function resetRelationFilter() {
+  document.getElementById('rf-user-filter').value = '';
+  document.getElementById('rf-user-type').value = 'uid';
+  relationDataType = 'invite';
+  relationGroup = 'down';
+  document.querySelectorAll('#rf-data-type-tabs .segmented-tab').forEach(b => b.classList.toggle('active', b.getAttribute('onclick').includes("'invite'")));
+  document.querySelectorAll('#rf-group-tabs .segmented-tab').forEach(b => b.classList.toggle('active', b.getAttribute('onclick').includes("'down'")));
+  updateRelationUserPlaceholder();
+  document.getElementById('relation-result').innerHTML = `<div class="empty-state" style="padding:56px 24px;">
+    <svg width="40" height="40" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="3" width="16" height="14" rx="1"/><path d="M6 8h8M6 12h5"/></svg>
+    请输入用户UID、用户邮箱或用户钱包地址进行查询
+  </div>`;
+}
+
+renderRelationTable();
+</script>
+
+</body>
+</html>
