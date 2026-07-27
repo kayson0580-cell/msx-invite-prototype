@@ -14,8 +14,9 @@
       <a class="sidebar-item " href="teams.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="6" height="6" rx="1"/><rect x="12" y="5" width="6" height="6" rx="1"/><rect x="2" y="13" width="11" height="6" rx="1"/><rect x="17" y="13" width="1" height="6" rx=".5"/></svg>团队管理</a>
       <a class="sidebar-item " href="bd-groups.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="7" height="6" rx="1"/><rect x="11" y="3" width="7" height="6" rx="1"/><rect x="2" y="11" width="7" height="6" rx="1"/><rect x="11" y="11" width="7" height="6" rx="1"/></svg>BD组管理</a>
       <a class="sidebar-item active" href="bd-members.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="3"/><circle cx="14" cy="7" r="3"/><path d="M1 17v-1a4 4 0 014-4h4a4 4 0 014 4v1"/><path d="M12 17v-1a4 4 0 014-4h1"/></svg>BD管理</a>
-      <div class="sidebar-section">代理商管理</div>
-      <a class="sidebar-item " href="agents.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="8" r="4"/><path d="M3 18v-1a5 5 0 015-5h4a5 5 0 015 5v1"/></svg>代理商管理</a>
+      <a class="sidebar-item " href="agent-manage.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="16" height="12" rx="1.5"/><path d="M2 8h16"/><path d="M6 12h4"/></svg>总代管理</a>
+      <div class="sidebar-section">返佣关系管理</div>
+      <a class="sidebar-item " href="agents.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="8" r="4"/><path d="M3 18v-1a5 5 0 015-5h4a5 5 0 015 5v1"/></svg>总代申请与审批</a>
       <a class="sidebar-item " href="agent-relation.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="10" r="3"/><circle cx="14" cy="10" r="3"/><path d="M9 10h2"/></svg>返佣关系查询</a>
       <a class="sidebar-item " href="agent-change.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10a7 7 0 0112-4.9M17 10a7 7 0 01-12 4.9"/><path d="M15 3v3h-3M5 17v-3h3"/></svg>代理商变更</a>
     </nav>
@@ -35,6 +36,7 @@
     <div class="filter-bar">
       <div class="search-input"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="5"/><path d="M13 13l4 4"/></svg><input class="form-input" placeholder="搜索BD名称..." id="bf-name-filter"></div>
       <input class="form-input" placeholder="BD ID" style="width:100px;" id="bf-id-filter">
+      <select class="form-select" style="width:160px;" id="bf-team-filter" onchange="onBDTeamFilterChange()"><option value="">全部所属团队</option></select>
       <select class="form-select" style="width:160px;" id="bf-group-filter"><option value="">全部BD组</option></select>
       <select class="form-select" style="width:150px;" id="bf-type-filter"><option value="">全部团队类型</option><option value="BD--代理商模式">BD--代理商模式</option><option value="BD--地推模式">BD--地推模式</option><option value="卡商--地推模式">卡商--地推模式</option><option value="独立代理商模式">独立代理商模式</option></select>
       <select class="form-select" style="width:110px;" id="bf-status-filter"><option value="">全部状态</option><option value="启用">启用</option><option value="禁用">禁用</option><option value="离职">离职</option></select>
@@ -54,7 +56,6 @@
       <div class="form-grid">
         <div class="full"><div class="form-group"><label class="form-label">BD名称 <span class="req">*</span></label><input class="form-input" placeholder="例如：张三" id="bf-name"></div></div>
         <div><div class="form-group"><label class="form-label">BD Lark</label><select class="form-select" id="bf-lark"><option value="">请选择Lark联系人</option></select></div></div>
-        <div><div class="form-group"><label class="form-label">UID <span class="req">*</span></label><div style="display:flex;gap:8px;"><input class="form-input" placeholder="请输入用户UID" id="bf-uid" style="flex:1;"><button type="button" class="btn btn-secondary" onclick="checkUID()" id="bf-uid-check-btn">校验</button></div><span class="form-hint" id="bf-uid-hint"></span></div></div>
         <div><div class="form-group"><label class="form-label">所属团队 <span class="req">*</span></label><select class="form-select" id="bf-team" onchange="onBDTeamChange()"><option value="">请选择</option></select></div></div>
         <div><div class="form-group"><label class="form-label">所属BD组 <span class="req">*</span></label><select class="form-select" id="bf-group"><option value="">请先选择团队</option></select></div></div>
         <div><div class="form-group"><label class="form-label">是否为组长</label><select class="form-select" id="bf-leader"><option value="false">否</option><option value="true">是</option></select></div></div>
@@ -70,7 +71,7 @@
 
 <script src="common.js"></script>
 <script>
-const bs = { data:[], filtered:[], page:1, size:10, sort:'', dir:'asc', editingId:null, uidVerified:false };
+const bs = { data:[], filtered:[], page:1, size:10, sort:'', dir:'asc', editingId:null };
 const BD_LINE_DEFS = [ { key:'co', label:'合约' }, { key:'spot', label:'现货' }, { key:'deposit', label:'充值' }, { key:'card', label:'充卡' } ];
 let currentBDLines = {};
 const LARK_CONTACTS = [
@@ -95,19 +96,27 @@ function fmtAmt(n) {
 
 function renderBDs() {
   bs.data = [...bdData]; bs.filtered = [...bdData]; bs.page = 1;
+  updateBDTeamFilterOptions();
   updateBDGroupOptions();
   renderBDTable();
+}
+
+function onBDTeamFilterChange() {
+  document.getElementById('bf-group-filter').value = '';
+  updateBDGroupOptions();
 }
 
 function filterBDs() {
   const name = (document.getElementById('bf-name-filter')?.value || '').toLowerCase();
   const id = (document.getElementById('bf-id-filter')?.value || '').trim();
+  const teamId = document.getElementById('bf-team-filter')?.value || '';
   const gid = document.getElementById('bf-group-filter')?.value || '';
   const status = document.getElementById('bf-status-filter')?.value || '';
   const bfType = document.getElementById('bf-type-filter')?.value || '';
   bs.filtered = bdData.filter(b => {
     if (name && !b.name.toLowerCase().includes(name)) return false;
     if (id && b.id !== parseInt(id)) return false;
+    if (teamId && getBDTeam(b)?.id !== parseInt(teamId)) return false;
     if (gid && b.groupId !== parseInt(gid)) return false;
     if (bfType && getBDTeamType(b) !== bfType) return false;
     if (status && b.status !== status) return false;
@@ -117,7 +126,8 @@ function filterBDs() {
 }
 
 function resetBDFilters() {
-  ['bf-name-filter','bf-id-filter','bf-group-filter','bf-type-filter','bf-status-filter'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  ['bf-name-filter','bf-id-filter','bf-team-filter','bf-group-filter','bf-type-filter','bf-status-filter'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  updateBDGroupOptions();
   bs.filtered = [...bdData]; bs.page = 1; renderBDTable();
 }
 
@@ -167,15 +177,14 @@ function renderBDTable() {
   const statusBadge = (st) => st==='启用' ? '<span class="badge badge-emerald">启用</span>' : st==='禁用' ? '<span class="badge badge-amber">禁用</span>' : '<span class="badge badge-rose">离职</span>';
   document.getElementById('bd-table').innerHTML = `
     <thead><tr>
-      ${th('BD ID','id')}<th>UID</th><th>BD名称</th><th>所属BD组</th><th>所属团队</th><th>团队类型</th><th style="text-align:center">组长</th><th style="text-align:center">状态</th>
+      ${th('BD ID','id')}<th>BD名称</th><th>所属BD组</th><th>所属团队</th><th>团队类型</th><th style="text-align:center">组长</th><th style="text-align:center">状态</th>
       <th style="text-align:center">合约</th><th style="text-align:center">现货</th><th style="text-align:center">充值</th><th style="text-align:center">充卡</th>
-      <th style="text-align:center">创建人</th><th style="text-align:center">创建时间</th><th style="text-align:center">修改人</th><th style="text-align:center">修改时间</th><th style="text-align:center">操作</th>
+      <th style="text-align:center">创建人</th><th style="text-align:center">创建时间</th><th style="text-align:center">修改人</th><th style="text-align:center">修改时间</th><th class="sticky-col" style="text-align:center">操作</th>
     </tr></thead>
-    <tbody>${pageData.length === 0 ? `<tr><td colspan="17"><div class="empty-state"><svg width="40" height="40" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="3" width="16" height="14" rx="1"/><path d="M6 8h8M6 12h5"/></svg>没有找到匹配的BD</div></td></tr>` : pageData.map(b => {
+    <tbody>${pageData.length === 0 ? `<tr><td colspan="16"><div class="empty-state"><svg width="40" height="40" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="3" width="16" height="14" rx="1"/><path d="M6 8h8M6 12h5"/></svg>没有找到匹配的BD</div></td></tr>` : pageData.map(b => {
       const bdTeamType = getBDTeamType(b);
       return `<tr>
         <td style="color:rgba(9,9,11,.40);font-size:12px;">#${b.id}</td>
-        <td style="font-size:13px;">${b.uid||'-'}</td>
         <td style="font-weight:500;">${b.name}</td>
         <td><span class="badge badge-indigo">${getGroupName(b.groupId)}</span></td>
         <td>${getTeamName((groupData.find(function(g){return g.id===b.groupId})||{}).teamId)||'-'}</td>
@@ -190,7 +199,7 @@ function renderBDTable() {
         <td style="text-align:center;font-size:12px;color:rgba(9,9,11,.45);">${b.createdAt||'-'}</td>
         <td style="text-align:center;font-size:13px;">${b.updatedBy||'-'}</td>
         <td style="text-align:center;font-size:12px;color:rgba(9,9,11,.45);">${b.updatedAt||'-'}</td>
-        <td style="text-align:center;"><a class="link" href="javascript:editBD(${b.id})">编辑</a> &nbsp;<a class="link" href="javascript:copyBD(${b.id})">复制</a></td>
+        <td class="sticky-col" style="text-align:center;"><a class="link" href="javascript:editBD(${b.id})">编辑</a> &nbsp;<a class="link" href="javascript:copyBD(${b.id})">复制</a></td>
       </tr>`;
     }).join('')}</tbody>`;
 
@@ -250,12 +259,7 @@ function renderBDRateSection() {
 
 function openBDModal() {
   bs.editingId = null;
-  bs.uidVerified = false;
   document.getElementById('bd-modal-title').textContent = '新建BD';
-  document.getElementById('bf-uid').value = '';
-  document.getElementById('bf-uid').disabled = false;
-  document.getElementById('bf-uid-check-btn').style.display = '';
-  document.getElementById('bf-uid-hint').innerHTML = '';
   document.getElementById('bf-name').value = '';
   populateLarkSelect('');
   var teamSel = document.getElementById('bf-team');
@@ -273,36 +277,11 @@ function openBDModal() {
 
 function closeBDModal() { document.getElementById('modal-bd').classList.remove('open'); }
 
-function checkUID() {
-  var uid = document.getElementById('bf-uid').value.trim();
-  var hint = document.getElementById('bf-uid-hint');
-  var btn = document.getElementById('bf-uid-check-btn');
-  if (!uid) { hint.innerHTML = '<span style="color:#dc2626;">请先输入UID</span>'; bs.uidVerified = false; return; }
-  // Check if editing — allow own UID
-  if (bs.editingId) {
-    var self = bdData.find(function(x) { return x.id === bs.editingId; });
-    if (self && self.uid === uid) { hint.innerHTML = '<span style="color:#16a34a;">✓ 当前BD的UID</span>'; bs.uidVerified = true; return; }
-  }
-  var exists = bdData.some(function(x) { return x.uid === uid; });
-  if (exists) {
-    hint.innerHTML = '<span style="color:#dc2626;">✗ 该UID已是BD，无法重复添加</span>';
-    bs.uidVerified = false;
-  } else {
-    hint.innerHTML = '<span style="color:#16a34a;">✓ 该UID可用</span>';
-    bs.uidVerified = true;
-  }
-}
-
 function copyBD(id) {
   bs.editingId = null;
-  bs.uidVerified = false;
   document.getElementById('bd-modal-title').textContent = '新建BD';
   var b = bdData.find(function(x) { return x.id === id; });
   if (!b) return;
-  document.getElementById('bf-uid').value = '';
-  document.getElementById('bf-uid').disabled = false;
-  document.getElementById('bf-uid-check-btn').style.display = '';
-  document.getElementById('bf-uid-hint').innerHTML = '<span style="color:#d97706;">请修改UID后重新校验</span>';
   document.getElementById('bf-name').value = b.name + ' - 副本';
   populateLarkSelect(b.lark || '');
   // Pre-select team from BD's group
@@ -330,14 +309,9 @@ function copyBD(id) {
 
 function editBD(id) {
   bs.editingId = id;
-  bs.uidVerified = true;
   document.getElementById('bd-modal-title').textContent = '编辑BD';
   var b = bdData.find(function(x) { return x.id === id; });
   if (!b) return;
-  document.getElementById('bf-uid').value = b.uid || '';
-  document.getElementById('bf-uid').disabled = true;
-  document.getElementById('bf-uid-check-btn').style.display = 'none';
-  document.getElementById('bf-uid-hint').innerHTML = '';
   document.getElementById('bf-name').value = b.name;
   populateLarkSelect(b.lark || '');
   // Team cascading: find team from BD's group, populate both dropdowns
@@ -362,13 +336,10 @@ function editBD(id) {
 }
 
 function saveBD() {
-  var uid = document.getElementById('bf-uid').value.trim();
   var name = document.getElementById('bf-name').value.trim();
   var lark = document.getElementById('bf-lark').value;
   var teamId = document.getElementById('bf-team').value;
   var groupId = document.getElementById('bf-group').value;
-  if (!uid) return alert('请填写UID');
-  if (!bs.editingId && !bs.uidVerified) return alert('请先校验UID');
   if (!name) return alert('请填写BD名称');
   if (!teamId) return alert('请选择所属团队');
   if (!groupId) return alert('请选择所属BD组');
@@ -385,7 +356,7 @@ function saveBD() {
   });
   if (overLimitMsg) return alert(overLimitMsg);
   var obj = {
-    id: bs.editingId || nextId(bdData), uid: uid, name: name, lark: lark, groupId: parseInt(groupId),
+    id: bs.editingId || nextId(bdData), name: name, lark: lark, groupId: parseInt(groupId),
     isLeader: document.getElementById('bf-leader').value === 'true',
     status: document.getElementById('bf-status').value,
     lines: lines,

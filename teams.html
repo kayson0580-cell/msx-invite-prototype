@@ -26,10 +26,14 @@
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="3"/><circle cx="14" cy="7" r="3"/><path d="M1 17v-1a4 4 0 014-4h4a4 4 0 014 4v1"/><path d="M12 17v-1a4 4 0 014-4h1"/></svg>
         BD管理
       </a>
-      <div class="sidebar-section">代理商管理</div>
+      <a class="sidebar-item " href="agent-manage.html">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="16" height="12" rx="1.5"/><path d="M2 8h16"/><path d="M6 12h4"/></svg>
+        总代管理
+      </a>
+      <div class="sidebar-section">返佣关系管理</div>
       <a class="sidebar-item " href="agents.html">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="8" r="4"/><path d="M3 18v-1a5 5 0 015-5h4a5 5 0 015 5v1"/></svg>
-        代理商管理
+        总代申请与审批
       </a>
       <a class="sidebar-item " href="agent-relation.html">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="10" r="3"/><circle cx="14" cy="10" r="3"/><path d="M9 10h2"/></svg>
@@ -64,7 +68,7 @@
       <div class="search-input"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="5"/><path d="M13 13l4 4"/></svg><input class="form-input" placeholder="搜索团队名称..." id="tf-name-filter"></div>
       <input class="form-input" placeholder="团队ID" style="width:100px;" id="tf-id-filter">
       <select class="form-select" style="width:140px;" id="tf-type-filter"><option value="">全部类型</option><option value="BD--代理商模式">BD--代理商模式</option><option value="BD--地推模式">BD--地推模式</option><option value="卡商--地推模式">卡商--地推模式</option><option value="独立代理商模式">独立代理商模式</option></select>
-      <select class="form-select" style="width:130px;" id="tf-cycle-filter"><option value="">结算周期</option><option value="日结算">日结算</option><option value="周结算">周结算</option><option value="月结算">月结算</option></select>
+      <select class="form-select" style="width:130px;" id="tf-cycle-filter"><option value="">结算周期</option><option value="日结算">日结算</option><option value="月结算">月结算</option></select>
       <select class="form-select" style="width:110px;" id="tf-status-filter"><option value="">全部状态</option><option value="enabled">启用</option><option value="disabled">停用</option></select>
       <button class="btn btn-primary" onclick="filterTeams()">查询</button>
       <button class="btn btn-secondary" onclick="resetTeamFilters()">重置</button>
@@ -99,7 +103,7 @@
 
       <div class="subsection-label">结算与状态</div>
       <div class="form-grid">
-        <div><div class="form-group"><label class="form-label">返佣结算周期 <span class="req">*</span></label><span class="form-hint">控制该团队返佣多久发放结算一次</span><select class="form-select" id="tf-cycle"><option value="daily">日结算</option><option value="weekly">周结算</option><option value="monthly">月结算</option></select></div></div>
+        <div><div class="form-group"><label class="form-label">返佣结算周期 <span class="req">*</span></label><span class="form-hint">控制该团队返佣多久发放结算一次</span><select class="form-select" id="tf-cycle"><option value="daily">日结算</option><option value="monthly">月结算</option></select></div></div>
         <div><div class="form-group"><label class="form-label">结算状态 <span class="req">*</span></label><span class="form-hint">停用后团队整体暂停参与返佣结算</span><div id="tf-status-wrap"></div></div></div>
       </div>
 
@@ -122,7 +126,7 @@ const LINE_DEFS = [
   { key:'co',      label:'合约', rateMax:100, rateStep:0.1 },
   { key:'spot',    label:'现货', rateMax:100, rateStep:0.1 },
   { key:'deposit', label:'充值', rateMax:1,   rateStep:0.01 },
-  { key:'card',    label:'充卡', rateMax:1,   rateStep:0.01 },
+  { key:'card',    label:'充卡', rateMax:100, rateStep:0.1 },
 ];
 let teamTempTiers = { co:[], spot:[], deposit:[], card:[] };
 
@@ -355,7 +359,7 @@ function sortTeams(field) {
 function renderTeamTable() {
   let sorted = [...ts.filtered];
   if (ts.sort) {
-    const order = { '日结算':1, '周结算':2, '月结算':3 };
+    const order = { '日结算':1, '月结算':2 };
     sorted.sort((a,b) => {
       let va = ts.sort === 'cycle' ? (order[a[ts.sort]]||0) : a[ts.sort];
       let vb = ts.sort === 'cycle' ? (order[b[ts.sort]]||0) : b[ts.sort];
@@ -376,7 +380,7 @@ function renderTeamTable() {
       ${th('团队ID','id')}<th>团队名称</th><th>团队类型</th><th style="text-align:center">返佣深度</th>
       <th style="text-align:center">推荐绑卡</th><th style="text-align:center">叠加手续费</th>
       <th>已启用业务线</th>
-      ${th('结算周期','cycle')}<th style="text-align:center">状态</th><th style="text-align:center">创建人</th><th style="text-align:center">修改人</th><th style="text-align:center">创建时间</th><th style="text-align:center">修改时间</th><th style="text-align:center">操作</th>
+      ${th('结算周期','cycle')}<th style="text-align:center">状态</th><th style="text-align:center">创建人</th><th style="text-align:center">修改人</th><th style="text-align:center">创建时间</th><th style="text-align:center">修改时间</th><th class="sticky-col" style="text-align:center">操作</th>
     </tr></thead>
     <tbody>${pageData.length === 0 ? `<tr><td colspan="14"><div class="empty-state"><svg width="40" height="40" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="3" width="16" height="14" rx="1"/><path d="M6 8h8M6 12h5"/></svg>没有找到匹配的团队</div></td></tr>` : pageData.map(t => `
       <tr>
@@ -393,7 +397,7 @@ function renderTeamTable() {
         <td style="text-align:center;font-size:13px;">${t.updatedBy}</td>
         <td style="text-align:center;font-size:12px;color:rgba(9,9,11,.45);">${t.createdAt}</td>
         <td style="text-align:center;font-size:12px;color:rgba(9,9,11,.45);">${t.updatedAt}</td>
-        <td style="text-align:center;"><a class="link" href="javascript:editTeam(${t.id})">编辑</a> &nbsp;<a class="link" href="javascript:copyTeam(${t.id})">复制</a></td>
+        <td class="sticky-col" style="text-align:center;"><a class="link" href="javascript:editTeam(${t.id})">编辑</a> &nbsp;<a class="link" href="javascript:copyTeam(${t.id})">复制</a></td>
       </tr>`).join('')}</tbody>`;
 
   document.getElementById('team-pagination').innerHTML = `

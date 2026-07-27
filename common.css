@@ -282,6 +282,10 @@ body {
 /* ═══════════ Table ═══════════ */
 .table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; }
+.sticky-col { position: sticky; right: 0; background: #ffffff; box-shadow: -6px 0 8px -6px rgba(0,0,0,.08); }
+table th.sticky-col { background: var(--glass-bg); z-index: 2; }
+table td.sticky-col { z-index: 1; }
+table tbody tr:hover td.sticky-col { background: var(--glass-bg); }
 table th {
   text-align: left; padding: 12px 16px;
   font-size: 11px; font-weight: 600; color: var(--text-muted);
@@ -713,17 +717,12 @@ table tbody tr:hover {
 }
 .hover-tip-wrap .hover-tip {
   display: none;
-  position: absolute; bottom: calc(100% + 8px); left: 0;
+  position: fixed;
   background: #18181b; color: #fff;
   padding: 6px 14px; border-radius: 8px;
   font-size: 12.5px; white-space: nowrap; text-align: left;
   box-shadow: 0 8px 24px rgba(9,9,11,.25);
-  z-index: 20;
-}
-.hover-tip-wrap:hover .hover-tip { display: block; }
-.hover-tip-wrap .hover-tip::after {
-  content: ''; position: absolute; top: 100%; left: 10px;
-  border: 5px solid transparent; border-top-color: #18181b;
+  z-index: 1000;
 }
 .hover-tip-row {
   display: flex; align-items: center; justify-content: space-between; gap: 24px;
@@ -747,17 +746,14 @@ table tbody tr:hover {
 /* ═══════════ Tier Badge / Popover ═══════════ */
 .tier-badge { position: relative; cursor: default; }
 .tier-badge .tier-popover {
-  display: none; position: absolute;
-  bottom: calc(100% + 8px); left: 50%;
-  transform: translateX(-50%);
+  display: none; position: fixed;
   background: #ffffff;
   border-radius: 12px; overflow: hidden;
-  min-width: 300px; z-index: 999;
+  min-width: 300px; z-index: 1000;
   border: 1px solid var(--glass-border);
   box-shadow: 0 12px 40px rgba(9,9,11,.16);
   white-space: nowrap;
 }
-.tier-badge:hover .tier-popover { display: block; }
 .tier-popover-header {
   background: var(--text);
   padding: 10px 14px; display: flex; gap: 12px;

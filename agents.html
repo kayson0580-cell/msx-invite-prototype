@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>返佣系统后台 - 代理商管理</title>
+<title>返佣系统后台 - 总代申请与审批</title>
 <link rel="stylesheet" href="common.css">
 </head>
 <body>
@@ -14,29 +14,42 @@
       <a class="sidebar-item " href="teams.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="6" height="6" rx="1"/><rect x="12" y="5" width="6" height="6" rx="1"/><rect x="2" y="13" width="11" height="6" rx="1"/><rect x="17" y="13" width="1" height="6" rx=".5"/></svg>团队管理</a>
       <a class="sidebar-item " href="bd-groups.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="7" height="6" rx="1"/><rect x="11" y="3" width="7" height="6" rx="1"/><rect x="2" y="11" width="7" height="6" rx="1"/><rect x="11" y="11" width="7" height="6" rx="1"/></svg>BD组管理</a>
       <a class="sidebar-item " href="bd-members.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="3"/><circle cx="14" cy="7" r="3"/><path d="M1 17v-1a4 4 0 014-4h4a4 4 0 014 4v1"/><path d="M12 17v-1a4 4 0 014-4h1"/></svg>BD管理</a>
-      <div class="sidebar-section">代理商管理</div>
-      <a class="sidebar-item active" href="agents.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="8" r="4"/><path d="M3 18v-1a5 5 0 015-5h4a5 5 0 015 5v1"/></svg>代理商管理</a>
+      <a class="sidebar-item " href="agent-manage.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="16" height="12" rx="1.5"/><path d="M2 8h16"/><path d="M6 12h4"/></svg>总代管理</a>
+      <div class="sidebar-section">返佣关系管理</div>
+      <a class="sidebar-item active" href="agents.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="8" r="4"/><path d="M3 18v-1a5 5 0 015-5h4a5 5 0 015 5v1"/></svg>总代申请与审批</a>
       <a class="sidebar-item " href="agent-relation.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="10" r="3"/><circle cx="14" cy="10" r="3"/><path d="M9 10h2"/></svg>返佣关系查询</a>
       <a class="sidebar-item " href="agent-change.html"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10a7 7 0 0112-4.9M17 10a7 7 0 01-12 4.9"/><path d="M15 3v3h-3M5 17v-3h3"/></svg>代理商变更</a>
     </nav>
     <div class="sidebar-footer"><div class="avatar">A</div><div class="info">Admin<small>管理员</small></div></div>
   </aside>
 <div class="main">
-  <div class="breadcrumb"><span>代理商管理</span><span class="sep">/</span><strong >代理商管理</strong></div>
+  <div class="breadcrumb"><span>总代申请与审批</span><span class="sep">/</span><strong >总代申请与审批</strong></div>
   <div class="page-header">
-    <div><h2>代理商管理</h2><p>管理所有代理商及其返佣授权配置</p></div>
+    <div><h2>总代申请与审批</h2><p>管理所有总代</p></div>
     <div style="display:flex;gap:10px;">
       <button class="btn btn-primary" onclick="openAgentModal()">
-        <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4v12M4 10h12"/></svg>新建代理商
+        <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4v12M4 10h12"/></svg>申请新建总代
       </button>
     </div>
   </div>
   <div class="card">
     <div class="filter-bar">
       <div class="search-input"><svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="5"/><path d="M13 13l4 4"/></svg><input class="form-input" placeholder="搜索代理商名称..." id="af-name-filter"></div>
-      <input class="form-input" placeholder="代理商ID" style="width:110px;" id="af-id-filter">
-      <select class="form-select" style="width:150px;" id="af-type-filter"><option value="">全部团队类型</option><option value="BD--代理商模式">BD--代理商模式</option><option value="BD--地推模式">BD--地推模式</option><option value="卡商--地推模式">卡商--地推模式</option></select>
-      <select class="form-select" style="width:120px;" id="af-level-filter"><option value="">全部层级</option></select>
+      <div class="combo-input">
+        <select class="combo-select" id="af-user-type" onchange="updateAgentUserPlaceholder()">
+          <option value="uid">用户ID</option>
+          <option value="email">用户邮箱</option>
+          <option value="wallet">钱包地址</option>
+        </select>
+        <input class="combo-text" placeholder="请输入用户ID" id="af-user-filter">
+        <button class="combo-clear" onclick="clearAgentUserInput()" title="清空">
+          <svg width="10" height="10" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 5l10 10M15 5L5 15"/></svg>
+        </button>
+      </div>
+      <select class="form-select" style="width:160px;" id="af-team-filter" onchange="onAgentTeamFilterChange()"><option value="">全部所属团队</option></select>
+      <select class="form-select" style="width:160px;" id="af-group-filter" onchange="onAgentGroupFilterChange()"><option value="">全部所属BD组</option></select>
+      <select class="form-select" style="width:160px;" id="af-bd-filter"><option value="">全部所属BD</option></select>
+      <select class="form-select" style="width:150px;" id="af-teamtype-filter"><option value="">全部团队类型</option><option value="BD--代理商模式">BD--代理商模式</option><option value="BD--地推模式">BD--地推模式</option><option value="卡商--地推模式">卡商--地推模式</option><option value="独立代理商模式">独立代理商模式</option></select>
       <button class="btn btn-primary" onclick="filterAgents()">查询</button>
       <button class="btn btn-secondary" onclick="resetAgentFilters()">重置</button>
     </div>
@@ -47,105 +60,298 @@
 
 <div class="modal-overlay" id="modal-agent">
   <div class="modal modal-wide">
-    <div class="modal-header"><h3 id="agent-modal-title">新建代理商</h3><button class="modal-close" onclick="closeAgentModal()">✕</button></div>
+    <div class="modal-header"><h3 id="agent-modal-title">申请新建总代</h3><button class="modal-close" onclick="closeAgentModal()">✕</button></div>
     <div class="modal-body">
-      <div class="section-title">基本信息</div>
+      <div class="subsection-label">用户信息</div>
       <div class="form-grid">
-        <div class="full"><div class="form-group"><label class="form-label">代理商名称 <span class="req">*</span></label><input class="form-input" placeholder="例如：华东代理-李明" id="af-name"></div></div>
-        <div><div class="form-group"><label class="form-label">代理层级</label><input class="form-input" type="number" min="1" max="10" value="1" id="af-level"><span class="form-hint">默认为1，每增加一级+1</span></div></div>
-        <div><div class="form-group"><label class="form-label">所属团队 <span class="req">*</span></label><select class="form-select" id="af-team"><option value="">请选择</option></select></div></div>
-        <div><div class="form-group"><label class="form-label">最大返佣深度 <span class="req">*</span></label><input class="form-input" type="number" min="1" max="10" placeholder="如 3" id="af-depth"></div></div>
+        <div><div class="form-group"><label class="form-label">用户ID <span class="req">*</span></label><input class="form-input" placeholder="请输入用户ID" id="af-uid"></div></div>
+        <div><div class="form-group"><label class="form-label">代理名称 <span class="req">*</span></label><input class="form-input" placeholder="例如：华东代理-李明" id="af-name"></div></div>
+        <div><div class="form-group"><label class="form-label">所在地区</label><select class="form-select" id="af-region"><option value="">请选择</option></select></div></div>
+        <div><div class="form-group"><label class="form-label">申请人</label><input class="form-input" placeholder="请输入申请人姓名" id="af-applicant"></div></div>
       </div>
-      <div class="section-title">返佣授权比例</div>
+      <div class="subsection-label">管理BD</div>
       <div class="form-grid">
-        <div><div class="form-group"><label class="form-label">币币合约返佣授权比例</label><div style="display:flex;align-items:center;gap:8px;"><input class="form-input" type="number" min="0" max="100" step="0.1" placeholder="80" id="af-co"><span style="color:rgba(9,9,11,.40);font-size:14px;">%</span></div></div></div>
-        <div><div class="form-group"><label class="form-label">RWA合约返佣授权比例</label><div style="display:flex;align-items:center;gap:8px;"><input class="form-input" type="number" min="0" max="100" step="0.1" placeholder="70" id="af-rwa"><span style="color:rgba(9,9,11,.40);font-size:14px;">%</span></div></div></div>
-        <div><div class="form-group"><label class="form-label">现货返佣授权比例</label><div style="display:flex;align-items:center;gap:8px;"><input class="form-input" type="number" min="0" max="100" step="0.1" placeholder="60" id="af-spot"><span style="color:rgba(9,9,11,.40);font-size:14px;">%</span></div></div></div>
-        <div><div class="form-group"><label class="form-label">充值返佣授权比例</label><div style="display:flex;align-items:center;gap:8px;"><input class="form-input" type="number" min="0" max="100" step="0.1" placeholder="50" id="af-deposit"><span style="color:rgba(9,9,11,.40);font-size:14px;">%</span></div></div></div>
-        <div><div class="form-group"><label class="form-label">充卡返佣授权比例</label><div style="display:flex;align-items:center;gap:8px;"><input class="form-input" type="number" min="0" max="1" step="0.01" placeholder="0.5" id="af-card"><span style="color:rgba(9,9,11,.40);font-size:14px;">%</span></div><span class="form-hint">0%-1%</span></div></div>
+        <div class="full"><div class="form-group"><label class="form-label">所属BD <span class="req">*</span></label><select class="form-select" id="af-bd" onchange="onAgentBDChange()"><option value="">请选择所属BD</option></select><div id="af-bd-info" style="display:none;margin-top:12px;"></div></div></div>
+      </div>
+      <div class="subsection-label">联系方式</div>
+      <div class="form-grid">
+        <div><div class="form-group"><label class="form-label">手机</label><input class="form-input" placeholder="请输入手机号" id="af-phone"></div></div>
+        <div><div class="form-group"><label class="form-label">邮箱 <span class="req">*</span></label><input class="form-input" placeholder="请输入邮箱" id="af-email"></div></div>
+        <div><div class="form-group"><label class="form-label">微信</label><input class="form-input" placeholder="请输入微信号" id="af-wechat"></div></div>
+        <div><div class="form-group"><label class="form-label">TG</label><input class="form-input" placeholder="请输入Telegram" id="af-tg"></div></div>
+      </div>
+      <div class="section-title">申请信息</div>
+      <div class="subsection-label">有交易所经验</div>
+      <div class="form-grid">
+        <div><div class="form-group"><label class="form-label">有交易所经验 <span class="req">*</span></label><select class="form-select" id="af-has-exp" onchange="toggleExpDesc()"><option value="">请选择</option><option value="yes">是</option><option value="no">否</option></select></div></div>
+        <div class="full" id="af-exp-desc-wrap" style="display:none;"><div class="form-group"><label class="form-label">经验描述</label><textarea class="form-input" rows="3" placeholder="请描述交易所合作经验" id="af-exp-desc"></textarea></div></div>
+      </div>
+      <div class="subsection-label">预期目标</div>
+      <div class="form-grid">
+        <div><div class="form-group"><label class="form-label">预期用户数</label><input class="form-input" type="number" min="0" placeholder="0" id="af-exp-users"></div></div>
+        <div><div class="form-group"><label class="form-label">预期交易量</label><input class="form-input" type="number" min="0" step="0.01" placeholder="0.00" id="af-exp-volume"></div></div>
+      </div>
+      <div class="subsection-label">返佣比例</div>
+      <div class="form-grid">
+        <div><div class="form-group"><label class="form-label">期望合约返佣比例</label><div style="display:flex;align-items:center;gap:8px;"><input class="form-input" type="number" min="0" max="100" step="0.1" placeholder="80" id="af-co"><span style="color:rgba(9,9,11,.40);font-size:14px;">%</span></div></div></div>
+        <div><div class="form-group"><label class="form-label">期望现货返佣比例</label><div style="display:flex;align-items:center;gap:8px;"><input class="form-input" type="number" min="0" max="100" step="0.1" placeholder="60" id="af-spot"><span style="color:rgba(9,9,11,.40);font-size:14px;">%</span></div></div></div>
+        <div><div class="form-group"><label class="form-label">期望充值返佣比例</label><div style="display:flex;align-items:center;gap:8px;"><input class="form-input" type="number" min="0" max="1" step="0.01" placeholder="0.5" id="af-deposit"><span style="color:rgba(9,9,11,.40);font-size:14px;">%</span></div><span class="form-hint">0%-1%</span></div></div>
+        <div><div class="form-group"><label class="form-label">期望充卡返佣比例</label><div style="display:flex;align-items:center;gap:8px;"><input class="form-input" type="number" min="0" max="100" step="0.1" placeholder="50" id="af-card"><span style="color:rgba(9,9,11,.40);font-size:14px;">%</span></div></div></div>
+      </div>
+      <div class="subsection-label">社媒情况</div>
+      <div class="form-grid">
+        <div class="full">
+          <div class="form-group">
+            <label class="form-label">社媒平台</label>
+            <div id="af-social-list" style="display:flex;flex-direction:column;gap:12px;"></div>
+            <button type="button" class="btn btn-secondary btn-sm" style="margin-top:14px;width:fit-content;" onclick="addAgentSocial()">+ 添加社媒</button>
+          </div>
+        </div>
       </div>
     </div>
     <div class="modal-footer"><button class="btn btn-secondary" onclick="closeAgentModal()">取消</button><button class="btn btn-primary" onclick="saveAgent()">保存</button></div>
   </div>
 </div>
 
+<div class="modal-overlay" id="modal-review">
+  <div class="modal modal-wide">
+    <div class="modal-header"><h3>审核申请</h3><button class="modal-close" onclick="closeReviewModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="subsection-label">申请信息</div>
+      <div class="info-box" id="review-summary"></div>
+      <div class="subsection-label">所属BD信息</div>
+      <div id="review-bd-info"></div>
+
+      <div class="subsection-label">返佣比例</div>
+      <span class="form-hint">审核人员为该总代设置最终生效的返佣比例，默认带入申请时的期望值，可按团队授权上限调整</span>
+      <div class="segmented-tabs" id="review-rate-tabs" style="margin-top:12px;"></div>
+      <div id="review-rates" style="margin-top:14px;"></div>
+
+      <div class="subsection-label">最大返佣深度</div>
+      <span class="form-hint">审核人员为该总代设置最终生效的最大返佣深度</span>
+      <div class="form-grid" style="margin-top:12px;">
+        <div><div class="form-group"><input class="form-input" type="number" min="1" max="10" id="review-depth" style="max-width:200px;"></div></div>
+      </div>
+
+      <div class="subsection-label">审核结果</div>
+      <div class="form-grid">
+        <div class="full">
+          <label style="display:inline-flex;align-items:center;gap:6px;margin-right:28px;cursor:pointer;"><input type="radio" name="review-result" value="已通过"> 通过</label>
+          <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;"><input type="radio" name="review-result" value="已拒绝"> 拒绝</label>
+        </div>
+      </div>
+
+      <div class="subsection-label">审核备注</div>
+      <div class="form-grid">
+        <div class="full">
+          <textarea class="form-input" rows="3" placeholder="选填，拒绝时建议填写理由" id="review-note"></textarea>
+          <div style="margin-top:10px;display:flex;align-items:center;gap:10px;">
+            <input type="file" id="review-attach-input" multiple style="display:none;" onchange="handleReviewAttachChange(this)">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('review-attach-input').click()">+ 上传附件</button>
+            <span class="form-hint">最多5个，单个不超过1MB</span>
+          </div>
+          <div id="review-attach-list" style="margin-top:10px;display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeReviewModal()">取消</button>
+      <button class="btn btn-primary" onclick="submitReview()">提交</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-view-agent">
+  <div class="modal modal-wide">
+    <div class="modal-header"><h3>查看总代</h3><button class="modal-close" onclick="closeViewAgentModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="subsection-label">申请信息</div>
+      <div class="info-box" id="view-summary"></div>
+
+      <div class="subsection-label">所属BD信息</div>
+      <div id="view-bd-info"></div>
+
+      <div class="subsection-label">返佣比例信息</div>
+      <div id="view-rates" style="display:flex;flex-direction:column;gap:14px;"></div>
+
+      <div class="subsection-label">审核信息</div>
+      <div class="info-box" id="view-review-info"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeViewAgentModal()">关闭</button>
+    </div>
+  </div>
+</div>
+
 <script src="common.js"></script>
 <script>
-const as = { data:[], filtered:[], page:1, size:10, sort:'', dir:'asc', editingId:null };
+const as = { data:[], filtered:[], page:1, size:10, editingId:null };
+const agentUserPlaceholders = { uid:'请输入用户ID', email:'请输入用户邮箱', wallet:'请输入钱包地址' };
+
+function updateAgentUserPlaceholder() {
+  const type = document.getElementById('af-user-type').value;
+  document.getElementById('af-user-filter').placeholder = agentUserPlaceholders[type] || '';
+}
+
+function clearAgentUserInput() {
+  document.getElementById('af-user-filter').value = '';
+  document.getElementById('af-user-filter').focus();
+}
 
 function renderAgents() {
   as.data = [...agentData]; as.filtered = [...agentData]; as.page = 1;
-  updateAgentLevelOptions();
+  updateAgentTeamFilterOptions();
   renderAgentTable();
+}
+
+function updateAgentTeamFilterOptions() {
+  const sel = document.getElementById('af-team-filter');
+  if (!sel) return;
+  const val = sel.value;
+  sel.innerHTML = '<option value="">全部所属团队</option>' + teamData.map(t => '<option value="' + t.id + '" ' + (String(t.id)===val?'selected':'') + '>' + t.name + '</option>').join('');
+  populateAgentGroupFilter();
+  populateAgentBDFilter();
+}
+
+function populateAgentGroupFilter() {
+  const teamId = document.getElementById('af-team-filter')?.value || '';
+  const sel = document.getElementById('af-group-filter');
+  if (!sel) return;
+  const val = sel.value;
+  const groups = teamId ? groupData.filter(g => g.teamId === parseInt(teamId)) : groupData;
+  sel.innerHTML = '<option value="">全部所属BD组</option>' + groups.map(g => '<option value="' + g.id + '" ' + (String(g.id)===val && groups.some(x=>String(x.id)===val)?'selected':'') + '>' + g.name + '</option>').join('');
+}
+
+function populateAgentBDFilter() {
+  const teamId = document.getElementById('af-team-filter')?.value || '';
+  const groupId = document.getElementById('af-group-filter')?.value || '';
+  const sel = document.getElementById('af-bd-filter');
+  if (!sel) return;
+  const val = sel.value;
+  let bds = bdData;
+  if (groupId) bds = bds.filter(b => b.groupId === parseInt(groupId));
+  else if (teamId) { const groupIds = groupData.filter(g => g.teamId === parseInt(teamId)).map(g => g.id); bds = bds.filter(b => groupIds.includes(b.groupId)); }
+  sel.innerHTML = '<option value="">全部所属BD</option>' + bds.map(b => '<option value="' + b.id + '" ' + (String(b.id)===val && bds.some(x=>String(x.id)===val)?'selected':'') + '>' + b.name + '</option>').join('');
+}
+
+function onAgentTeamFilterChange() {
+  populateAgentGroupFilter();
+  populateAgentBDFilter();
+}
+
+function onAgentGroupFilterChange() {
+  populateAgentBDFilter();
 }
 
 function filterAgents() {
   const name = (document.getElementById('af-name-filter')?.value || '').toLowerCase();
-  const id = (document.getElementById('af-id-filter')?.value || '').trim();
-  const level = document.getElementById('af-level-filter')?.value || '';
-  const afType = document.getElementById('af-type-filter')?.value || '';
+  const userType = document.getElementById('af-user-type')?.value || 'uid';
+  const userKw = (document.getElementById('af-user-filter')?.value || '').trim().toLowerCase();
+  const teamId = document.getElementById('af-team-filter')?.value || '';
+  const groupId = document.getElementById('af-group-filter')?.value || '';
+  const bdId = document.getElementById('af-bd-filter')?.value || '';
+  const teamType = document.getElementById('af-teamtype-filter')?.value || '';
   as.filtered = agentData.filter(a => {
     if (name && !a.name.toLowerCase().includes(name)) return false;
-    if (id && a.id !== parseInt(id)) return false;
-    if (level && a.level !== parseInt(level)) return false;
-    if (afType && getAgentTeamType(a) !== afType) return false;
+    if (userKw) {
+      const field = userType === 'email' ? (a.email||'') : userType === 'wallet' ? (a.wallet||'') : (a.uid||'');
+      if (!field.toLowerCase().includes(userKw)) return false;
+    }
+    const bd = bdData.find(b => b.id === a.bdId);
+    if (bdId && a.bdId !== parseInt(bdId)) return false;
+    if (!bdId && (groupId || teamId)) {
+      if (!bd) return false;
+      if (groupId && bd.groupId !== parseInt(groupId)) return false;
+      if (teamId) { const g = groupData.find(x => x.id === bd.groupId); if (!g || g.teamId !== parseInt(teamId)) return false; }
+    }
+    if (teamType && (!bd || getBDTeamType(bd) !== teamType)) return false;
     return true;
   });
   as.page = 1; renderAgentTable();
 }
 
 function resetAgentFilters() {
-  ['af-name-filter','af-id-filter','af-type-filter','af-level-filter'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  ['af-name-filter','af-user-filter','af-teamtype-filter'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('af-user-type').value = 'uid';
+  updateAgentUserPlaceholder();
+  document.getElementById('af-team-filter').value = '';
+  populateAgentGroupFilter();
+  populateAgentBDFilter();
   as.filtered = [...agentData]; as.page = 1; renderAgentTable();
 }
 
-function sortAgents(field) {
-  if (as.sort === field) { as.dir = as.dir === 'asc' ? 'desc' : 'asc'; }
-  else { as.sort = field; as.dir = 'asc'; }
-  renderAgentTable();
+function formatTierBadge(tiers) {
+  if (!tiers || !tiers.length) return '<span class="form-hint">未设置</span>';
+  var rows = '';
+  for (var i = 0; i < tiers.length; i++) {
+    var t = tiers[i];
+    var prevAmt = i > 0 ? tiers[i-1].amount : 0;
+    var range = t.amount ? (prevAmt ? '$' + (prevAmt>=1e6?(prevAmt/1e6).toFixed(0)+'M':(prevAmt/1e3).toFixed(0)+'K') + ' < ' : '') + '≤$' + (t.amount>=1e6?(t.amount/1e6).toFixed(0)+'M':(t.amount/1e3).toFixed(0)+'K') : '>$' + (prevAmt>=1e6?(prevAmt/1e6).toFixed(0)+'M':(prevAmt/1e3).toFixed(0)+'K');
+    rows += '<div class="tier-popover-row"><span class="tier-amount">' + range + '</span><span class="tier-rate">' + t.rate + '%</span></div>';
+  }
+  return '<span class="tier-badge badge badge-emerald">跟随团队 · ' + tiers.length + '档<div class="tier-popover"><div class="tier-popover-header"><span>累计交易额</span><span>返佣比例</span></div><div class="tier-popover-body">' + rows + '</div></div></span>';
+}
+
+function agentRateCell(team, key, rateVal) {
+  var tl = team && team.lines ? team.lines[key] : null;
+  if (!tl || !tl.enabled) return '<span class="form-hint">未启用</span>';
+  if (tl.mode === 'tier') return formatTierBadge(tl.tiers);
+  return '<strong>' + (rateVal||0) + '%</strong>';
 }
 
 function renderAgentTable() {
   let sorted = [...as.filtered];
-  if (as.sort) {
-    sorted.sort((a,b) => {
-      let va = a[as.sort], vb = b[as.sort];
-      if (typeof va === 'string') va = va.toLowerCase();
-      if (typeof vb === 'string') vb = vb.toLowerCase();
-      return (va < vb ? -1 : va > vb ? 1 : 0) * (as.dir === 'asc' ? 1 : -1);
-    });
-  }
   const total = sorted.length;
   const pages = Math.max(1, Math.ceil(total / as.size));
   if (as.page > pages) as.page = pages;
   const start = (as.page - 1) * as.size;
   const pageData = sorted.slice(start, start + as.size);
 
-  const th = (label, field) => `<th class="sortable" onclick="sortAgents('${field}')">${label} ${as.sort===field ? (as.dir==='asc'?'▲':'▼') : '⇅'}</th>`;
   document.getElementById('agent-table').innerHTML = `
     <thead><tr>
-      ${th('代理商ID','id')}<th>代理商名称</th>${th('代理层级','level')}<th>团队类型</th>${th('返佣深度','depth')}
-      ${th('币币合约','coRate')}${th('RWA合约','rwaRate')}${th('现货比例','spotRate')}${th('充值返佣','depositRate')}${th('充卡返佣','cardRate')}
-      <th style="text-align:center">创建人</th><th style="text-align:center">创建时间</th><th style="text-align:center">修改人</th><th style="text-align:center">修改时间</th><th style="text-align:center">操作</th>
+      <th>代理商UID</th><th style="text-align:center">审核状态</th><th>代理商名称</th><th>申请人</th><th>所在地区</th><th>所属BD概况</th>
+      <th>期望返佣比例</th>
+      <th>联系方式</th><th style="text-align:center">社交媒体数量</th><th>预期用户数</th><th>预期交易量</th>
+      <th>申请时间</th><th>修改时间</th><th>修改人</th><th>审核人</th><th>审核时间</th>
+      <th class="sticky-col" style="text-align:center">操作</th>
     </tr></thead>
-    <tbody>${pageData.length === 0 ? `<tr><td colspan="15"><div class="empty-state"><svg width="40" height="40" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="3" width="16" height="14" rx="1"/><path d="M6 8h8M6 12h5"/></svg>没有找到匹配的代理商</div></td></tr>` : pageData.map(a => `
+    <tbody>${pageData.length === 0 ? `<tr><td colspan="16"><div class="empty-state"><svg width="40" height="40" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="3" width="16" height="14" rx="1"/><path d="M6 8h8M6 12h5"/></svg>没有找到匹配的代理商</div></td></tr>` : pageData.map(a => {
+      const bd = bdData.find(b => b.id === a.bdId);
+      const team = bd ? getBDTeam(bd) : null;
+      const reviewMap = { '已通过':'badge-emerald', '已拒绝':'badge-rose', '未审核':'badge-slate' };
+      const reviewStatus = a.reviewStatus || '未审核';
+      const socials = a.socials || [];
+      const contactParts = [a.phone && ('手机 ' + a.phone), a.wechat && ('微信 ' + a.wechat), a.tg && ('TG ' + a.tg)].filter(Boolean);
+      return `
       <tr>
-        <td style="color:rgba(9,9,11,.40);font-size:12px;">#${a.id}</td>
+        <td style="color:rgba(9,9,11,.40);font-size:12px;">${(a.email || a.wallet)
+          ? `<span class="hover-tip-wrap"><span>${a.uid||'-'}</span><span class="hover-tip">${[a.email && ('邮箱 '+a.email), a.wallet && ('钱包地址 '+a.wallet)].filter(Boolean).map(p => `<div class="hover-tip-row"><span>${p}</span></div>`).join('')}</span></span>`
+          : (a.uid||'-')}</td>
+        <td style="text-align:center;"><span class="badge ${reviewMap[reviewStatus]}">${reviewStatus}</span></td>
         <td style="font-weight:500;">${a.name}</td>
-        <td style="text-align:center;"><span class="badge ${a.level===1?'badge-emerald':'badge-indigo'}">${a.level} 级</span></td>
-        <td>${badge(getAgentTeamType(a)||'-')}</td>
-        <td style="text-align:center;">${a.depth} 级</td>
-        <td style="text-align:center;font-weight:500;">${a.coRate}%</td>
-        <td style="text-align:center;">${a.rwaRate}%</td>
-        <td style="text-align:center;">${a.spotRate}%</td>
-        <td style="text-align:center;">${a.depositRate}%</td>
-        <td style="text-align:center;">${a.cardRate}%</td>
-        <td style="text-align:center;font-size:13px;">${a.createdBy||'-'}</td>
-        <td style="text-align:center;font-size:12px;color:rgba(9,9,11,.45);">${a.createdAt||'-'}</td>
-        <td style="text-align:center;font-size:13px;">${a.updatedBy||'-'}</td>
-        <td style="text-align:center;font-size:12px;color:rgba(9,9,11,.45);">${a.updatedAt||'-'}</td>
-        <td style="text-align:center;"><a class="link" href="javascript:editAgent(${a.id})">编辑</a></td>
-      </tr>`).join('')}</tbody>`;
+        <td>${a.applicant||'-'}</td>
+        <td>${a.region||'-'}</td>
+        <td>${bd ? `<div style="font-weight:500;">${bd.name}</div><div style="font-size:12px;color:rgba(9,9,11,.5);margin-top:2px;">${team ? team.name : '-'}｜${team ? team.type : '-'}</div>` : '-'}</td>
+        <td style="font-size:13px;white-space:nowrap;">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span style="color:rgba(9,9,11,.5);">合约：</span>${agentRateCell(team,'co',a.coRate)}<span style="color:rgba(9,9,11,.5);">现货：</span>${agentRateCell(team,'spot',a.spotRate)}</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px;"><span style="color:rgba(9,9,11,.5);">充值：</span>${agentRateCell(team,'deposit',a.depositRate)}<span style="color:rgba(9,9,11,.5);">充卡：</span>${agentRateCell(team,'card',a.cardRate)}</div>
+        </td>
+        <td>${contactParts.length
+          ? `<span class="hover-tip-wrap" style="font-size:13px;"><span>${a.email||'-'}</span><span class="hover-tip">${contactParts.map(p => `<div class="hover-tip-row"><span>${p}</span></div>`).join('')}</span></span>`
+          : `<span style="font-size:13px;">${a.email||'-'}</span>`}</td>
+        <td style="text-align:center;">${socials.length ? `<span class="hover-tip-wrap"><span style="text-decoration:underline dotted;cursor:default;">${socials.length}</span><span class="hover-tip" style="white-space:normal;width:260px;">${socials.map((s, i) => `<div style="${i>0 ? 'border-top:1px solid rgba(255,255,255,.12);margin-top:8px;padding-top:8px;' : ''}"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;"><strong style="color:#fff;">${s.platform||'未选平台'}</strong><span style="color:rgba(255,255,255,.55);flex-shrink:0;">${s.count||0} 人</span></div><div style="color:rgba(255,255,255,.5);font-size:11px;margin-top:3px;word-break:break-all;">${s.link||'未填写链接'}</div>${s.desc ? `<div style="color:rgba(255,255,255,.85);font-size:12px;margin-top:4px;">${s.desc}</div>` : ''}</div>`).join('')}</span></span>` : '<span style="color:rgba(9,9,11,.3);">-</span>'}</td>
+        <td style="text-align:center;">${a.expUsers||0}</td>
+        <td style="text-align:center;">${a.expVolume||0}</td>
+        <td style="font-size:12px;color:rgba(9,9,11,.45);">${a.createdAt||'-'}</td>
+        <td style="font-size:12px;color:rgba(9,9,11,.45);">${a.updatedAt||'-'}</td>
+        <td style="font-size:13px;">${a.updatedBy||'-'}</td>
+        <td style="font-size:13px;">${a.reviewedBy||'-'}</td>
+        <td style="font-size:12px;color:rgba(9,9,11,.45);">${a.reviewedAt||'-'}</td>
+        <td class="sticky-col" style="text-align:center;">${reviewStatus === '已通过'
+          ? `<a class="link" href="javascript:openViewAgentModal(${a.id})">查看</a>`
+          : `<a class="link" href="javascript:editAgent(${a.id})">编辑</a> &nbsp;|&nbsp; <a class="link" href="javascript:openReviewModal(${a.id})">审核</a>`}</td>
+      </tr>`;
+    }).join('')}</tbody>`;
 
   document.getElementById('agent-pagination').innerHTML = `
     <div class="pagination-info">共 <strong>${total}</strong> 个代理商 &nbsp;|&nbsp; 每页
@@ -159,16 +365,206 @@ function renderAgentTable() {
     </div>`;
 }
 
+let agentSocialTemp = [];
+const AGENT_SOCIAL_PLATFORMS = ['Twitter/X','YouTube','Telegram频道','抖音','其他'];
+
+function renderAgentSocialList() {
+  const list = document.getElementById('af-social-list');
+  if (!list) return;
+  list.innerHTML = agentSocialTemp.map(function(t, i) {
+    return '<div style="border:1px solid var(--glass-border);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;">'
+      + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
+      + '<select class="form-select" style="width:150px;" onchange="agentSocialTemp[' + i + '].platform=this.value">'
+      + '<option value="">请选择平台</option>'
+      + AGENT_SOCIAL_PLATFORMS.map(function(p) { return '<option value="' + p + '" ' + (t.platform===p?'selected':'') + '>' + p + '</option>'; }).join('')
+      + '</select>'
+      + '<input class="form-input" style="flex:1;min-width:160px;" placeholder="请输入链接" value="' + (t.link||'') + '" onchange="agentSocialTemp[' + i + '].link=this.value">'
+      + '<input class="form-input" type="number" min="0" style="width:150px;" placeholder="粉丝数/社群人数" value="' + (t.count||'') + '" onchange="agentSocialTemp[' + i + '].count=parseInt(this.value)||0">'
+      + '<button type="button" class="icon-btn-ghost" title="删除该社媒" onclick="removeAgentSocial(' + i + ')">✕</button>'
+      + '</div>'
+      + '<textarea class="form-input" rows="2" placeholder="请描述该社媒/社群情况" onchange="agentSocialTemp[' + i + '].desc=this.value">' + (t.desc||'') + '</textarea>'
+      + '</div>';
+  }).join('') || '<div class="tier-empty-hint">尚未添加社媒，点击下方按钮添加</div>';
+}
+
+function addAgentSocial() {
+  agentSocialTemp.push({ platform:'', link:'', count:0, desc:'' });
+  renderAgentSocialList();
+}
+
+function removeAgentSocial(i) {
+  agentSocialTemp.splice(i, 1);
+  renderAgentSocialList();
+}
+
+function resetApplyExtraFields() {
+  populateCountrySelect('af-region');
+  ['af-uid','af-region','af-applicant','af-phone','af-email','af-wechat','af-tg','af-exp-desc','af-exp-users','af-exp-volume'].forEach(function(id) { var el = document.getElementById(id); if (el) el.value = ''; });
+  var bdSel = document.getElementById('af-bd');
+  bdSel.innerHTML = '<option value="">请选择所属BD</option>' + bdData.map(function(b) { return '<option value="' + b.id + '">' + b.name + '</option>'; }).join('');
+  bdSel.value = '';
+  onAgentBDChange();
+  document.getElementById('af-has-exp').value = '';
+  document.getElementById('af-exp-desc-wrap').style.display = 'none';
+  agentSocialTemp = [];
+  renderAgentSocialList();
+}
+
+function lineTooltipHTML(l) {
+  let rows = '';
+  if (l.mode === 'tier' && l.tiers && l.tiers.length) {
+    rows += l.tiers.map(function(t, i) {
+      const lower = (i === 0 ? 0 : (l.tiers[i-1].amount || 0)).toLocaleString();
+      const isLast = i === l.tiers.length - 1;
+      const range = isLast ? ('&gt; ' + lower) : (lower + ' - ' + (t.amount||0).toLocaleString());
+      return '<div class="hover-tip-row"><span>' + range + '</span><strong>' + t.rate + '%</strong></div>';
+    }).join('');
+  }
+  if (l.requireActive || l.requireAmount) {
+    const reqParts = [];
+    if (l.requireActive) reqParts.push('必须激活U卡');
+    if (l.requireAmount) reqParts.push('必须充值金额达标');
+    rows += '<div class="hover-tip-row"><span>结算要求</span><strong>' + reqParts.join(' / ') + '</strong></div>';
+  }
+  return rows;
+}
+
+function buildTierScheduleHTML(l) {
+  let rows = '';
+  if (l.tiers && l.tiers.length) {
+    rows += l.tiers.map(function(t, i) {
+      const lower = (i === 0 ? 0 : (l.tiers[i-1].amount || 0)).toLocaleString();
+      const isLast = i === l.tiers.length - 1;
+      const range = isLast ? ('&gt; ' + lower) : (lower + ' - ' + (t.amount||0).toLocaleString());
+      return '<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:12px;"><span style="color:rgba(9,9,11,.5);">' + range + '</span><span style="font-weight:500;">' + t.rate + '%</span></div>';
+    }).join('');
+  }
+  if (l.requireActive || l.requireAmount) {
+    const reqParts = [];
+    if (l.requireActive) reqParts.push('必须激活U卡');
+    if (l.requireAmount) reqParts.push('必须充值金额达标');
+    rows += '<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:12px;border-top:1px solid var(--glass-border);margin-top:2px;"><span style="color:rgba(9,9,11,.5);">结算要求</span><span style="font-weight:500;">' + reqParts.join(' / ') + '</span></div>';
+  }
+  return '<div style="margin-top:8px;">' + rows + '</div>';
+}
+
+function buildApplicationSummaryHTML(a) {
+  const socials = a.socials || [];
+  return `
+    <div class="row">
+      <div class="item"><span class="label">代理名称</span><span class="value">${a.name}</span></div>
+      <div class="item"><span class="label">用户ID</span><span class="value">${a.uid||'-'}</span></div>
+      <div class="item"><span class="label">申请人</span><span class="value">${a.applicant||'-'}</span></div>
+      <div class="item"><span class="label">所在地区</span><span class="value">${a.region||'-'}</span></div>
+      <div class="item"><span class="label">当前状态</span><span class="value">${a.reviewStatus||'未审核'}</span></div>
+    </div>
+    <div class="row">
+      <div class="item"><span class="label">邮箱</span><span class="value">${a.email||'-'}</span></div>
+      <div class="item"><span class="label">手机</span><span class="value">${a.phone||'-'}</span></div>
+      <div class="item"><span class="label">微信</span><span class="value">${a.wechat||'-'}</span></div>
+      <div class="item"><span class="label">TG</span><span class="value">${a.tg||'-'}</span></div>
+    </div>
+    <div class="row">
+      <div class="item"><span class="label">有交易所经验</span><span class="value">${a.hasExp ? '是' : '否'}</span></div>
+      <div class="item"><span class="label">预期用户数</span><span class="value">${a.expUsers||0}</span></div>
+      <div class="item"><span class="label">预期交易量</span><span class="value">${a.expVolume||0}</span></div>
+    </div>
+    ${a.hasExp && a.expDesc ? `<div class="row"><div class="item" style="flex:1;"><span class="label">经验描述</span><span class="value" style="font-weight:400;">${a.expDesc}</span></div></div>` : ''}
+    <div class="row">
+      <div class="item" style="flex:1;">
+        <span class="label">社媒情况</span>
+        ${socials.length ? `<div style="margin-top:8px;display:flex;flex-direction:column;gap:8px;">${socials.map(s => `
+          <div style="border:1px solid var(--glass-border);border-radius:8px;padding:10px 12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+              <span style="font-weight:500;">${s.platform||'未选平台'}</span>
+              <span style="font-size:12px;color:rgba(9,9,11,.5);flex-shrink:0;">${s.count||0} 人</span>
+            </div>
+            <div style="font-size:12px;color:rgba(9,9,11,.5);margin-top:4px;word-break:break-all;">${s.link||'未填写链接'}</div>
+            ${s.desc ? `<div style="font-size:13px;font-weight:400;margin-top:6px;">${s.desc}</div>` : ''}
+          </div>`).join('')}</div>` : '<span class="value" style="font-weight:400;">无</span>'}
+      </div>
+    </div>
+    <div class="row rate-row">
+      <span>期望合约返佣比例 <strong>${a.coRate}%</strong></span>
+      <span>期望现货返佣比例 <strong>${a.spotRate}%</strong></span>
+      <span>期望充值返佣比例 <strong>${a.depositRate}%</strong></span>
+      <span>期望充卡返佣比例 <strong>${a.cardRate}%</strong></span>
+    </div>`;
+}
+
+function buildBDInfoHTML(b) {
+  const g = groupData.find(function(x) { return x.id === b.groupId; });
+  const team = getBDTeam(b);
+  const lineLabels = { co:'合约', spot:'现货', deposit:'充值', card:'充卡' };
+  const enabledLines = team ? Object.keys(lineLabels).filter(function(k) { return (team.lines || {})[k] && team.lines[k].enabled; }) : [];
+  return '<div class="info-box">'
+    + '<div class="row">'
+    + '<div class="item"><span class="label">BD姓名</span><span class="value">' + b.name + '</span></div>'
+    + '<div class="item"><span class="label">是否组长</span><span class="value">' + (b.isLeader?'<span class="badge badge-indigo">是</span>':'<span class="badge badge-slate">否</span>') + '</span></div>'
+    + '<div class="item"><span class="label">BD状态</span><span class="value">' + (b.status==='启用'?'<span class="badge badge-emerald">启用</span>':'<span class="badge badge-slate">禁用</span>') + '</span></div>'
+    + '</div>'
+    + '<div class="row rate-row">'
+    + '<span class="label" style="align-self:center;">BD自有返佣比例</span>'
+    + Object.keys(lineLabels).map(function(k) {
+        const label = lineLabels[k];
+        const tl = (team && team.lines || {})[k] || {};
+        if (!tl.enabled) return '<span>' + label + ' <strong>未启用</strong></span>';
+        if (tl.mode === 'tier') return '<span>' + label + ' <strong>跟随团队梯度</strong></span>';
+        return '<span>' + label + ' <strong>' + ((b.lines || {})[k] || 0) + '%</strong></span>';
+      }).join(' · ')
+    + '</div>'
+    + '<div class="row">'
+    + '<div class="item"><span class="label">所属BD组</span><span class="value">' + getGroupName(b.groupId) + '</span></div>'
+    + '<div class="item"><span class="label">组长</span><span class="value">' + (g ? g.leaderName : '未知') + '</span></div>'
+    + '<div class="item"><span class="label">组内成员数</span><span class="value">' + (g ? g.memberCount : '-') + ' 人</span></div>'
+    + '</div>'
+    + '<div class="row">'
+    + '<div class="item"><span class="label">所属团队</span><span class="value">' + (team ? team.name : '未知') + '</span></div>'
+    + '<div class="item"><span class="label">团队类型</span><span class="value">' + (team ? team.type : '-') + '</span></div>'
+    + '<div class="item"><span class="label">返佣深度</span><span class="value">' + (team ? team.depth + ' 级' : '-') + '</span></div>'
+    + '<div class="item"><span class="label">返佣结算周期</span><span class="value">' + (team ? team.cycle : '-') + '</span></div>'
+    + '<div class="item"><span class="label">状态</span><span class="value">' + (team ? (team.status==='enabled'?'<span class="badge badge-emerald">启用</span>':'<span class="badge badge-slate">停用</span>') : '-') + '</span></div>'
+    + '</div>'
+    + '<div class="row">'
+    + '<div class="item"><span class="label">推荐绑卡</span><span class="value">' + (team ? (team.requireCard?'<span class="badge badge-amber">是</span>':'<span class="badge badge-slate">否</span>') : '-') + '</span></div>'
+    + '<div class="item"><span class="label">叠加手续费</span><span class="value">' + (team ? (team.extraFee?'<span class="badge badge-amber">是</span>':'<span class="badge badge-slate">否</span>') : '-') + '</span></div>'
+    + '<div class="item"><span class="label">已启用业务线</span><span class="value">' + (enabledLines.length ? enabledLines.map(function(k) { return lineLabels[k]; }).join('、') : '无') + '</span></div>'
+    + '</div>'
+    + '<div class="row rate-row">'
+    + '<span class="label" style="align-self:center;">业务返佣设置</span>'
+    + Object.keys(lineLabels).map(function(k) {
+        const label = lineLabels[k];
+        const l = (team && team.lines || {})[k] || {};
+        if (!l.enabled) return '<span>' + label + ' <strong>未启用</strong></span>';
+        const val = l.mode === 'tier' ? '阶梯' : l.rate + '%';
+        const hasExtra = l.mode === 'tier' || l.requireActive || l.requireAmount;
+        if (hasExtra) return '<span>' + label + ' <span class="hover-tip-wrap"><strong>' + val + '</strong><span class="hover-tip">' + lineTooltipHTML(l) + '</span></span></span>';
+        return '<span>' + label + ' <strong>' + val + '</strong></span>';
+      }).join(' · ')
+    + '</div></div>';
+}
+
+function onAgentBDChange() {
+  const bdId = document.getElementById('af-bd').value;
+  const el = document.getElementById('af-bd-info');
+  if (!bdId) { el.style.display = 'none'; return; }
+  const b = bdData.find(function(x) { return x.id === parseInt(bdId); });
+  if (!b) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  el.innerHTML = buildBDInfoHTML(b);
+}
+
+function toggleExpDesc() {
+  var on = document.getElementById('af-has-exp').value === 'yes';
+  document.getElementById('af-exp-desc-wrap').style.display = on ? 'block' : 'none';
+}
+
 function openAgentModal() {
   as.editingId = null;
-  document.getElementById('agent-modal-title').textContent = '新建代理商';
+  document.getElementById('agent-modal-title').textContent = '申请新建总代';
   document.getElementById('af-name').value = '';
-  document.getElementById('af-level').value = '1';
-  var teamSel = document.getElementById('af-team');
-  teamSel.innerHTML = '<option value="">请选择</option>' + teamData.map(function(t) { return '<option value="' + t.id + '">' + t.name + '</option>'; }).join('');
-  teamSel.disabled = false;
-  document.getElementById('af-depth').value = '';
-  document.getElementById('af-co').value = ''; document.getElementById('af-rwa').value = ''; document.getElementById('af-spot').value = ''; document.getElementById('af-deposit').value = ''; document.getElementById('af-card').value = '';
+  document.getElementById('af-co').value = ''; document.getElementById('af-spot').value = ''; document.getElementById('af-deposit').value = ''; document.getElementById('af-card').value = '';
+  resetApplyExtraFields();
   document.getElementById('modal-agent').classList.add('open');
 }
 
@@ -176,29 +572,55 @@ function closeAgentModal() { document.getElementById('modal-agent').classList.re
 
 function editAgent(id) {
   as.editingId = id;
-  document.getElementById('agent-modal-title').textContent = '编辑代理商';
+  document.getElementById('agent-modal-title').textContent = '修改总代申请';
   const a = agentData.find(x => x.id === id);
   if (!a) return;
   document.getElementById('af-name').value = a.name;
-  document.getElementById('af-level').value = a.level;
-  var teamSel = document.getElementById('af-team');
-  teamSel.innerHTML = '<option value="">请选择</option>' + teamData.map(function(t) { return '<option value="' + t.id + '" ' + (t.id===a.teamId?'selected':'') + '>' + t.name + '</option>'; }).join('');
-  teamSel.disabled = true;
-  document.getElementById('af-depth').value = a.depth;
   document.getElementById('af-co').value = a.coRate;
-  document.getElementById('af-rwa').value = a.rwaRate;
   document.getElementById('af-spot').value = a.spotRate;
   document.getElementById('af-deposit').value = a.depositRate;
   document.getElementById('af-card').value = a.cardRate;
+  resetApplyExtraFields();
+  document.getElementById('af-uid').value = a.uid || '';
+  document.getElementById('af-region').value = a.region || '';
+  document.getElementById('af-applicant').value = a.applicant || '';
+  document.getElementById('af-phone').value = a.phone || '';
+  document.getElementById('af-email').value = a.email || '';
+  document.getElementById('af-wechat').value = a.wechat || '';
+  document.getElementById('af-tg').value = a.tg || '';
+  document.getElementById('af-exp-users').value = a.expUsers || '';
+  document.getElementById('af-exp-volume').value = a.expVolume || '';
+  agentSocialTemp = (a.socials && a.socials.length) ? a.socials.map(function(s) { return Object.assign({}, s); }) : [];
+  renderAgentSocialList();
+  if (a.bdId) { document.getElementById('af-bd').value = a.bdId; onAgentBDChange(); }
+  document.getElementById('af-has-exp').value = a.hasExp ? 'yes' : 'no';
+  document.getElementById('af-exp-desc').value = a.expDesc || '';
+  toggleExpDesc();
   document.getElementById('modal-agent').classList.add('open');
 }
 
 function saveAgent() {
   const name = document.getElementById('af-name').value.trim();
-  const teamId = document.getElementById('af-team').value;
-  if (!name) return alert('请填写代理商名称');
-  if (!teamId) return alert('请选择所属团队');
-  const obj = { id: as.editingId || nextId(agentData), name, teamId: parseInt(teamId), level: parseInt(document.getElementById('af-level').value) || 1, depth: parseInt(document.getElementById('af-depth').value) || 1, coRate: parseFloat(document.getElementById('af-co').value) || 0, rwaRate: parseFloat(document.getElementById('af-rwa').value) || 0, spotRate: parseFloat(document.getElementById('af-spot').value) || 0, depositRate: parseFloat(document.getElementById('af-deposit').value) || 0, cardRate: parseFloat(document.getElementById('af-card').value) || 0, status: '启用', createdBy: as.editingId ? (agentData.find(x=>x.id===as.editingId)?.createdBy||'admin') : 'admin', createdAt: as.editingId ? (agentData.find(x=>x.id===as.editingId)?.createdAt||now()) : now(), updatedBy: 'admin', updatedAt: now() };
+  const uid = document.getElementById('af-uid').value.trim();
+  const email = document.getElementById('af-email').value.trim();
+  const bdId = document.getElementById('af-bd').value;
+  const hasExp = document.getElementById('af-has-exp').value;
+  if (!name) return alert('请填写代理名称');
+  if (!uid) return alert('请填写用户ID');
+  if (!email) return alert('请填写邮箱');
+  if (!bdId) return alert('请选择所属BD');
+  if (!hasExp) return alert('请选择是否有交易所经验');
+  const prev = as.editingId ? agentData.find(x => x.id === as.editingId) : null;
+  const obj = { id: as.editingId || nextId(agentData), name, teamId: prev ? prev.teamId : null, level: prev ? prev.level : 1, depth: prev ? prev.depth : 1,
+    coRate: parseFloat(document.getElementById('af-co').value) || 0, rwaRate: prev ? prev.rwaRate : 0, spotRate: parseFloat(document.getElementById('af-spot').value) || 0, depositRate: parseFloat(document.getElementById('af-deposit').value) || 0, cardRate: parseFloat(document.getElementById('af-card').value) || 0,
+    uid, region: document.getElementById('af-region').value.trim(), applicant: document.getElementById('af-applicant').value.trim(),
+    bdId: parseInt(bdId) || null,
+    phone: document.getElementById('af-phone').value.trim(), email, wechat: document.getElementById('af-wechat').value.trim(), tg: document.getElementById('af-tg').value.trim(),
+    hasExp: hasExp === 'yes', expDesc: hasExp === 'yes' ? document.getElementById('af-exp-desc').value.trim() : '',
+    expUsers: parseInt(document.getElementById('af-exp-users').value) || 0, expVolume: parseFloat(document.getElementById('af-exp-volume').value) || 0,
+    socials: agentSocialTemp.filter(function(s) { return s.platform || s.link || s.count || s.desc; }).map(function(s) { return Object.assign({}, s); }),
+    reviewStatus: prev ? (prev.reviewStatus || '未审核') : '未审核',
+    status: '启用', createdBy: prev ? (prev.createdBy||'admin') : 'admin', createdAt: prev ? (prev.createdAt||now()) : now(), updatedBy: 'admin', updatedAt: now() };
   if (as.editingId) { const idx = agentData.findIndex(x => x.id === as.editingId); if (idx >= 0) agentData[idx] = obj; }
   else { agentData.push(obj); }
   closeAgentModal();
@@ -206,6 +628,197 @@ function saveAgent() {
 }
 
 document.getElementById('modal-agent').addEventListener('click', function(e) { if (e.target === this) closeAgentModal(); });
+
+let reviewingId = null;
+let reviewAttachments = [];
+
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+}
+
+function renderReviewAttachList() {
+  const el = document.getElementById('review-attach-list');
+  if (!el) return;
+  el.innerHTML = reviewAttachments.map(function(f, i) {
+    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;border:1px solid var(--glass-border);border-radius:6px;font-size:13px;">'
+      + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + f.name + '</span>'
+      + '<span style="display:flex;align-items:center;gap:8px;flex-shrink:0;"><span style="color:rgba(9,9,11,.45);font-size:12px;">' + formatFileSize(f.size) + '</span><button type="button" class="icon-btn-ghost" title="移除" onclick="removeReviewAttach(' + i + ')">✕</button></span>'
+      + '</div>';
+  }).join('');
+}
+
+function handleReviewAttachChange(input) {
+  const files = Array.from(input.files || []);
+  input.value = '';
+  for (const f of files) {
+    if (reviewAttachments.length >= 5) { alert('最多只能上传5个附件'); break; }
+    if (f.size > 1024 * 1024) { alert('「' + f.name + '」超过1MB，无法上传'); continue; }
+    reviewAttachments.push(f);
+  }
+  renderReviewAttachList();
+}
+
+function removeReviewAttach(i) {
+  reviewAttachments.splice(i, 1);
+  renderReviewAttachList();
+}
+
+let reviewRateLineData = {};
+let reviewRateState = {};
+
+function setReviewRateTab(k) {
+  document.querySelectorAll('#review-rate-tabs .segmented-tab').forEach(function(b) { b.classList.toggle('active', b.getAttribute('data-rate-tab') === k); });
+  const d = reviewRateLineData[k];
+  if (!d) return;
+  let body;
+  if (d.kind === 'unknown') {
+    body = '<span class="form-hint">该总代未关联到有效团队，无法设置返佣比例</span>';
+  } else if (d.kind === 'disabled') {
+    body = '<span class="form-hint">团队未启用该业务线返佣，无法为该总代设置比例</span>';
+  } else if (d.kind === 'tier') {
+    body = '<span class="form-hint">团队走阶梯梯度，按下方梯度结算，不可单独设置固定比例</span>' + buildTierScheduleHTML(d.tl);
+  } else {
+    body = '<div style="display:flex;align-items:center;gap:8px;margin-top:8px;"><input class="form-input" type="number" min="0" max="' + d.max + '" step="' + (k==='deposit'?'0.01':'0.1') + '" value="' + reviewRateState[k] + '" oninput="reviewRateState[\'' + k + '\']=parseFloat(this.value)||0" style="max-width:200px;"><span style="color:rgba(9,9,11,.40);font-size:14px;">%</span></div>'
+      + '<span class="form-hint">' + d.capHint + '</span>';
+  }
+  document.getElementById('review-rates').innerHTML = '<div style="border:1px solid var(--glass-border);border-radius:10px;padding:14px 16px;">'
+    + '<div class="form-label" style="margin-bottom:2px;">' + d.label + '返佣比例</div>' + body + '</div>';
+}
+
+function openReviewModal(id) {
+  reviewingId = id;
+  const a = agentData.find(x => x.id === id);
+  if (!a) return;
+  const bd = bdData.find(b => b.id === a.bdId);
+  const team = bd ? getBDTeam(bd) : null;
+
+  document.getElementById('review-bd-info').innerHTML = bd ? buildBDInfoHTML(bd) : '';
+
+  document.getElementById('review-summary').innerHTML = buildApplicationSummaryHTML(a);
+
+  const lineLabels = { co:'合约', spot:'现货', deposit:'充值', card:'充卡' };
+  const rateKeys = { co:'coRate', spot:'spotRate', deposit:'depositRate', card:'cardRate' };
+  reviewRateLineData = {};
+  reviewRateState = {};
+  Object.keys(lineLabels).forEach(function(k) {
+    const requested = a[rateKeys[k]];
+    const tl = (team && team.lines || {})[k] || {};
+    const approvedField = 'approved' + k.charAt(0).toUpperCase() + k.slice(1) + 'Rate';
+    const current = a[approvedField] != null ? a[approvedField] : requested;
+    const bdCap = bd ? ((bd.lines || {})[k] || 0) : 0;
+    let kind = 'editable';
+    if (!team) kind = 'unknown';
+    else if (!tl.enabled) kind = 'disabled';
+    else if (tl.mode === 'tier') kind = 'tier';
+    reviewRateLineData[k] = { label: lineLabels[k], tl: tl, kind: kind, bdCap: bdCap, capHint: kind === 'editable' ? ('BD上限 ' + bdCap + '%') : '', max: kind === 'editable' ? bdCap : (k === 'deposit' ? 1 : 100) };
+    reviewRateState[k] = current;
+  });
+
+  document.getElementById('review-rate-tabs').innerHTML = Object.keys(lineLabels).map(function(k, i) {
+    return '<button type="button" class="segmented-tab' + (i===0?' active':'') + '" data-rate-tab="' + k + '" onclick="setReviewRateTab(\'' + k + '\')">' + lineLabels[k] + '</button>';
+  }).join('');
+  setReviewRateTab(Object.keys(lineLabels)[0]);
+
+  document.getElementById('review-depth').value = a.depth || 1;
+
+  document.querySelectorAll('input[name="review-result"]').forEach(function(r) { r.checked = false; });
+  document.getElementById('review-note').value = '';
+  reviewAttachments = [];
+  renderReviewAttachList();
+  document.getElementById('modal-review').classList.add('open');
+}
+
+function closeReviewModal() { document.getElementById('modal-review').classList.remove('open'); reviewingId = null; }
+
+function submitReview() {
+  if (!reviewingId) return;
+  const selected = document.querySelector('input[name="review-result"]:checked');
+  if (!selected) return alert('请选择审核结果：通过或拒绝');
+  const idx = agentData.findIndex(x => x.id === reviewingId);
+  if (idx < 0) return;
+  agentData[idx].reviewStatus = selected.value;
+  agentData[idx].reviewNote = document.getElementById('review-note').value.trim();
+  agentData[idx].reviewAttachments = reviewAttachments.slice();
+  ['co','spot','deposit','card'].forEach(function(k) {
+    const d = reviewRateLineData[k];
+    if (d && d.kind === 'editable') agentData[idx]['approved' + k.charAt(0).toUpperCase() + k.slice(1) + 'Rate'] = reviewRateState[k] || 0;
+  });
+  agentData[idx].depth = parseInt(document.getElementById('review-depth').value) || 1;
+  agentData[idx].updatedBy = 'admin';
+  agentData[idx].updatedAt = now();
+  agentData[idx].reviewedBy = 'admin';
+  agentData[idx].reviewedAt = now();
+  closeReviewModal();
+  filterAgents();
+}
+
+document.getElementById('modal-review').addEventListener('click', function(e) { if (e.target === this) closeReviewModal(); });
+
+function buildReadOnlyRatesHTML(a, team, bd) {
+  const lineLabels = { co:'合约', spot:'现货', deposit:'充值', card:'充卡' };
+  const rateKeys = { co:'coRate', spot:'spotRate', deposit:'depositRate', card:'cardRate' };
+  return Object.keys(lineLabels).map(function(k) {
+    const label = lineLabels[k];
+    const tl = (team && team.lines || {})[k] || {};
+    const approvedField = 'approved' + k.charAt(0).toUpperCase() + k.slice(1) + 'Rate';
+    const current = a[approvedField] != null ? a[approvedField] : a[rateKeys[k]];
+    let body;
+    if (!team) body = '<span class="form-hint">该总代未关联到有效团队</span>';
+    else if (!tl.enabled) body = '<span class="form-hint">团队未启用该业务线返佣</span>';
+    else if (tl.mode === 'tier') body = '<span class="form-hint">团队走阶梯梯度，按下方梯度结算</span>' + buildTierScheduleHTML(tl);
+    else body = '<div style="font-size:20px;font-weight:600;margin-top:6px;">' + current + '%</div>';
+    return '<div style="border:1px solid var(--glass-border);border-radius:10px;padding:14px 16px;">'
+      + '<div class="form-label" style="margin-bottom:2px;">' + label + '返佣比例</div>' + body + '</div>';
+  }).join('');
+}
+
+function buildAttachmentLinksHTML(attachments) {
+  if (!attachments || !attachments.length) return '无';
+  return attachments.map(function(f) {
+    if (typeof f === 'string') {
+      return '<a class="link" href="javascript:alert(\'示例附件，没有实际文件内容可下载\')">' + f + '</a>';
+    }
+    const url = URL.createObjectURL(f);
+    return '<a class="link" href="' + url + '" download="' + f.name + '">' + f.name + '</a>';
+  }).join('、');
+}
+
+function openViewAgentModal(id) {
+  const a = agentData.find(x => x.id === id);
+  if (!a) return;
+  const bd = bdData.find(b => b.id === a.bdId);
+  const team = bd ? getBDTeam(bd) : null;
+
+  document.getElementById('view-summary').innerHTML = buildApplicationSummaryHTML(a);
+  document.getElementById('view-bd-info').innerHTML = bd ? buildBDInfoHTML(bd) : '';
+  document.getElementById('view-rates').innerHTML = buildReadOnlyRatesHTML(a, team, bd);
+
+  const reviewMap = { '已通过':'badge-emerald', '已拒绝':'badge-rose', '未审核':'badge-slate' };
+  const reviewStatus = a.reviewStatus || '未审核';
+  const attachments = a.reviewAttachments || [];
+  document.getElementById('view-review-info').innerHTML = `
+    <div class="row">
+      <div class="item"><span class="label">审核状态</span><span class="value"><span class="badge ${reviewMap[reviewStatus]}">${reviewStatus}</span></span></div>
+      <div class="item"><span class="label">最大返佣深度</span><span class="value">${a.depth ? a.depth + ' 级' : '-'}</span></div>
+      <div class="item"><span class="label">审核人</span><span class="value">${a.reviewedBy||'-'}</span></div>
+      <div class="item"><span class="label">审核时间</span><span class="value">${a.reviewedAt||'-'}</span></div>
+    </div>
+    <div class="row">
+      <div class="item" style="flex:1;"><span class="label">审核意见</span><span class="value" style="font-weight:400;">${a.reviewNote||'无'}</span></div>
+    </div>
+    <div class="row">
+      <div class="item" style="flex:1;"><span class="label">审核附件</span><span class="value" style="font-weight:400;">${buildAttachmentLinksHTML(attachments)}</span></div>
+    </div>`;
+
+  document.getElementById('modal-view-agent').classList.add('open');
+}
+
+function closeViewAgentModal() { document.getElementById('modal-view-agent').classList.remove('open'); }
+
+document.getElementById('modal-view-agent').addEventListener('click', function(e) { if (e.target === this) closeViewAgentModal(); });
+
 renderAgents();
 </script>
 
