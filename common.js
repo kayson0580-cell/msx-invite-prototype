@@ -65,10 +65,10 @@ const cycleMap = { daily:'日结算', monthly:'月结算' };
 const revCycleMap = { '日结算':'daily', '月结算':'monthly' };
 
 // 团队返佣业务线字段形状：
-// { enabled, requireActive, requireAmount, silverLimit, goldLimit, blackLimit, mode:'flat'|'tier', rate, tiers:[{amount,rate}] }
+// { enabled, requireActive, requireAmount, mode:'flat'|'tier', rate, tiers:[{amount,rate}] }
 // requireAmount 仅在 requireActive 为 true 时才可能为 true（表单上二者联动）
 function emptyTeamLine(extra) {
-  return Object.assign({ enabled:false, requireActive:false, requireAmount:false, silverLimit:0, goldLimit:0, blackLimit:0, mode:'flat', rate:0, tiers:[] }, extra || {});
+  return Object.assign({ enabled:false, requireActive:false, requireAmount:false, mode:'flat', rate:0, tiers:[] }, extra || {});
 }
 
 let teamData = [
@@ -90,10 +90,10 @@ let teamData = [
     createdBy:'admin', createdAt:'2026-02-03 10:15', updatedBy:'李主管', updatedAt:'2026-07-01 16:45' },
   { id:3, name:'卡商渠道组', type:'卡商--地推模式', depth:5, requireCard:true, extraFee:true, cycle:'月结算', status:'enabled',
     lines: {
-      co: emptyTeamLine({ enabled:true, requireActive:true, requireAmount:true, silverLimit:200, goldLimit:800, blackLimit:2500, mode:'tier',
+      co: emptyTeamLine({ enabled:true, requireActive:true, requireAmount:true, mode:'tier',
         tiers:[{amount:50000000,rate:20},{amount:200000000,rate:25},{amount:500000000,rate:30},{amount:1000000000,rate:35},{amount:0,rate:40}] }),
-      spot: emptyTeamLine({ enabled:true, requireActive:true, requireAmount:true, silverLimit:200, goldLimit:800, blackLimit:2500, mode:'flat', rate:60 }),
-      deposit: emptyTeamLine({ enabled:true, requireActive:true, requireAmount:true, silverLimit:200, goldLimit:800, blackLimit:2500, mode:'flat', rate:0.8 }),
+      spot: emptyTeamLine({ enabled:true, requireActive:true, requireAmount:true, mode:'flat', rate:60 }),
+      deposit: emptyTeamLine({ enabled:true, requireActive:true, requireAmount:true, mode:'flat', rate:0.8 }),
       card: emptyTeamLine({ enabled:true, mode:'tier',
         tiers:[{amount:50000000,rate:10},{amount:200000000,rate:15},{amount:500000000,rate:20},{amount:1000000000,rate:25},{amount:0,rate:30}] }),
     },

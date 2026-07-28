@@ -333,8 +333,12 @@ function renderAgentTable() {
         <td>${a.region||'-'}</td>
         <td>${bd ? `<div style="font-weight:500;">${bd.name}</div><div style="font-size:12px;color:rgba(9,9,11,.5);margin-top:2px;">${team ? team.name : '-'}｜${team ? team.type : '-'}</div>` : '-'}</td>
         <td style="font-size:13px;white-space:nowrap;">
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span style="color:rgba(9,9,11,.5);">合约：</span>${agentRateCell(team,'co',a.coRate)}<span style="color:rgba(9,9,11,.5);">现货：</span>${agentRateCell(team,'spot',a.spotRate)}</div>
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px;"><span style="color:rgba(9,9,11,.5);">充值：</span>${agentRateCell(team,'deposit',a.depositRate)}<span style="color:rgba(9,9,11,.5);">充卡：</span>${agentRateCell(team,'card',a.cardRate)}</div>
+          <div style="display:grid;grid-template-columns:auto auto;gap:6px 14px;align-items:center;justify-content:start;">
+            <span style="display:inline-flex;align-items:center;gap:5px;"><span style="color:rgba(9,9,11,.5);">合约：</span>${agentRateCell(team,'co',a.coRate)}</span>
+            <span style="display:inline-flex;align-items:center;gap:5px;"><span style="color:rgba(9,9,11,.5);">现货：</span>${agentRateCell(team,'spot',a.spotRate)}</span>
+            <span style="display:inline-flex;align-items:center;gap:5px;"><span style="color:rgba(9,9,11,.5);">充值：</span>${agentRateCell(team,'deposit',a.depositRate)}</span>
+            <span style="display:inline-flex;align-items:center;gap:5px;"><span style="color:rgba(9,9,11,.5);">充卡：</span>${agentRateCell(team,'card',a.cardRate)}</span>
+          </div>
         </td>
         <td>${contactParts.length
           ? `<span class="hover-tip-wrap" style="font-size:13px;"><span>${a.email||'-'}</span><span class="hover-tip">${contactParts.map(p => `<div class="hover-tip-row"><span>${p}</span></div>`).join('')}</span></span>`

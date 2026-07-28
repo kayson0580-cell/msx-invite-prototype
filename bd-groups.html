@@ -164,13 +164,6 @@ function lineTooltipHTML(l) {
     if (l.requireActive) reqParts.push('必须激活U卡');
     if (l.requireAmount) reqParts.push('必须充值金额达标');
     rows += `<div class="hover-tip-row"><span>结算要求</span><strong>${reqParts.join(' / ')}</strong></div>`;
-    if (l.requireAmount) {
-      const limitParts = [];
-      if (l.silverLimit) limitParts.push(`银卡≥${l.silverLimit.toLocaleString()}`);
-      if (l.goldLimit) limitParts.push(`金卡≥${l.goldLimit.toLocaleString()}`);
-      if (l.blackLimit) limitParts.push(`黑卡≥${l.blackLimit.toLocaleString()}`);
-      if (limitParts.length) rows += `<div class="hover-tip-row"><span>充值限额</span><strong style="font-weight:500;">${limitParts.join(' / ')}</strong></div>`;
-    }
   }
   return rows;
 }
