@@ -55,7 +55,6 @@
       <div class="section-title">基本信息</div>
       <div class="form-grid">
         <div class="full"><div class="form-group"><label class="form-label">BD名称 <span class="req">*</span></label><input class="form-input" placeholder="例如：张三" id="bf-name"></div></div>
-        <div><div class="form-group"><label class="form-label">BD Lark</label><select class="form-select" id="bf-lark"><option value="">请选择Lark联系人</option></select></div></div>
         <div><div class="form-group"><label class="form-label">所属团队 <span class="req">*</span></label><select class="form-select" id="bf-team" onchange="onBDTeamChange()"><option value="">请选择</option></select></div></div>
         <div><div class="form-group"><label class="form-label">所属BD组 <span class="req">*</span></label><select class="form-select" id="bf-group"><option value="">请先选择团队</option></select></div></div>
         <div><div class="form-group"><label class="form-label">是否为组长</label><select class="form-select" id="bf-leader"><option value="false">否</option><option value="true">是</option></select></div></div>
@@ -74,21 +73,6 @@
 const bs = { data:[], filtered:[], page:1, size:10, sort:'', dir:'asc', editingId:null };
 const BD_LINE_DEFS = [ { key:'co', label:'合约' }, { key:'spot', label:'现货' }, { key:'deposit', label:'充值' }, { key:'card', label:'充卡' } ];
 let currentBDLines = {};
-const LARK_CONTACTS = [
-  { id:'zhangsan', name:'张三', email:'zhangsan@company.com' },
-  { id:'lisi', name:'李四', email:'lisi@company.com' },
-  { id:'wangwu', name:'王五', email:'wangwu@company.com' },
-  { id:'sunqi', name:'孙七', email:'sunqi@company.com' },
-  { id:'zhouba', name:'周八', email:'zhouba@company.com' },
-  { id:'zhangjingli', name:'张经理', email:'zhangjingli@company.com' },
-  { id:'lizhuguan', name:'李主管', email:'lizhuguan@company.com' },
-];
-function populateLarkSelect(selectedId) {
-  var sel = document.getElementById('bf-lark');
-  sel.innerHTML = '<option value="">请选择Lark联系人</option>' + LARK_CONTACTS.map(function(c) {
-    return '<option value="' + c.id + '" ' + (c.id === selectedId ? 'selected' : '') + '>' + c.name + '（' + c.email + '）</option>';
-  }).join('');
-}
 function fmtAmt(n) {
   n = n || 0;
   return n.toLocaleString();
@@ -261,7 +245,6 @@ function openBDModal() {
   bs.editingId = null;
   document.getElementById('bd-modal-title').textContent = '新建BD';
   document.getElementById('bf-name').value = '';
-  populateLarkSelect('');
   var teamSel = document.getElementById('bf-team');
   teamSel.innerHTML = '<option value="">请选择</option>' + teamData.map(function(t) { return '<option value="' + t.id + '">' + t.name + '</option>'; }).join('');
   teamSel.disabled = false;
@@ -283,7 +266,6 @@ function copyBD(id) {
   var b = bdData.find(function(x) { return x.id === id; });
   if (!b) return;
   document.getElementById('bf-name').value = b.name + ' - 副本';
-  populateLarkSelect(b.lark || '');
   // Pre-select team from BD's group
   var bdGroup = groupData.find(function(g) { return g.id === b.groupId; });
   var bdTeamId = bdGroup ? bdGroup.teamId : null;
@@ -313,7 +295,6 @@ function editBD(id) {
   var b = bdData.find(function(x) { return x.id === id; });
   if (!b) return;
   document.getElementById('bf-name').value = b.name;
-  populateLarkSelect(b.lark || '');
   // Team cascading: find team from BD's group, populate both dropdowns
   var bdGroup = groupData.find(function(g) { return g.id === b.groupId; });
   var bdTeamId = bdGroup ? bdGroup.teamId : null;
@@ -337,7 +318,6 @@ function editBD(id) {
 
 function saveBD() {
   var name = document.getElementById('bf-name').value.trim();
-  var lark = document.getElementById('bf-lark').value;
   var teamId = document.getElementById('bf-team').value;
   var groupId = document.getElementById('bf-group').value;
   if (!name) return alert('请填写BD名称');
@@ -356,7 +336,7 @@ function saveBD() {
   });
   if (overLimitMsg) return alert(overLimitMsg);
   var obj = {
-    id: bs.editingId || nextId(bdData), name: name, lark: lark, groupId: parseInt(groupId),
+    id: bs.editingId || nextId(bdData), name: name, groupId: parseInt(groupId),
     isLeader: document.getElementById('bf-leader').value === 'true',
     status: document.getElementById('bf-status').value,
     lines: lines,

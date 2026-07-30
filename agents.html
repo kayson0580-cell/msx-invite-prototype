@@ -64,7 +64,7 @@
     <div class="modal-body">
       <div class="subsection-label">用户信息</div>
       <div class="form-grid">
-        <div><div class="form-group"><label class="form-label">用户ID <span class="req">*</span></label><input class="form-input" placeholder="请输入用户ID" id="af-uid"></div></div>
+        <div><div class="form-group"><label class="form-label">用户ID <span class="req">*</span></label><input class="form-input" placeholder="请输入用户ID" id="af-uid" oninput="onAgentUidChange()"></div></div>
         <div><div class="form-group"><label class="form-label">代理名称 <span class="req">*</span></label><input class="form-input" placeholder="例如：华东代理-李明" id="af-name"></div></div>
         <div><div class="form-group"><label class="form-label">所在地区</label><select class="form-select" id="af-region"><option value="">请选择</option></select></div></div>
         <div><div class="form-group"><label class="form-label">申请人</label><input class="form-input" placeholder="请输入申请人姓名" id="af-applicant"></div></div>
@@ -76,7 +76,7 @@
       <div class="subsection-label">联系方式</div>
       <div class="form-grid">
         <div><div class="form-group"><label class="form-label">手机</label><input class="form-input" placeholder="请输入手机号" id="af-phone"></div></div>
-        <div><div class="form-group"><label class="form-label">邮箱 <span class="req">*</span></label><input class="form-input" placeholder="请输入邮箱" id="af-email"></div></div>
+        <div><div class="form-group"><label class="form-label">注册邮箱</label><span class="form-hint" id="af-email-tip">根据用户ID自动带出，不可编辑；用户未绑定邮箱时不可提交</span><input class="form-input" placeholder="填写用户ID后自动带出" id="af-email" readonly style="background:var(--glass-bg);color:var(--text-secondary);cursor:not-allowed;"></div></div>
         <div><div class="form-group"><label class="form-label">微信</label><input class="form-input" placeholder="请输入微信号" id="af-wechat"></div></div>
         <div><div class="form-group"><label class="form-label">TG</label><input class="form-input" placeholder="请输入Telegram" id="af-tg"></div></div>
       </div>
@@ -603,6 +603,30 @@ function editAgent(id) {
   document.getElementById('modal-agent').classList.add('open');
 }
 
+// 模拟平台注册邮箱库：真实实现由后端按 uid 查询用户绑定的注册邮箱
+function lookupRegisteredEmail(uid) {
+  if (!uid) return null;
+  var hit = agentData.find(function(a) { return String(a.uid) === String(uid); });
+  if (hit && hit.email) return hit.email;
+  return MOCK_REGISTERED_EMAILS[uid] || null;
+}
+const MOCK_REGISTERED_EMAILS = { '20010':'newuser10@example.com', '20011':'newuser11@example.com' };
+
+function onAgentUidChange() {
+  var uid = document.getElementById('af-uid').value.trim();
+  var box = document.getElementById('af-email');
+  var tip = document.getElementById('af-email-tip');
+  if (!uid) { box.value = ''; box.style.color = 'var(--text-secondary)'; tip.textContent = '根据用户ID自动带出，不可编辑；用户未绑定邮箱时不可提交'; tip.style.color = ''; return; }
+  var email = lookupRegisteredEmail(uid);
+  if (email) {
+    box.value = email; box.style.color = 'var(--text)';
+    tip.textContent = '已带出该用户的注册邮箱'; tip.style.color = '';
+  } else {
+    box.value = ''; 
+    tip.textContent = '该用户未绑定邮箱，请先引导用户完成邮箱绑定'; tip.style.color = '#dc2626';
+  }
+}
+
 function saveAgent() {
   const name = document.getElementById('af-name').value.trim();
   const uid = document.getElementById('af-uid').value.trim();
@@ -611,7 +635,7 @@ function saveAgent() {
   const hasExp = document.getElementById('af-has-exp').value;
   if (!name) return alert('请填写代理名称');
   if (!uid) return alert('请填写用户ID');
-  if (!email) return alert('请填写邮箱');
+  if (!email) return alert('该用户未绑定邮箱，请先完成邮箱绑定后再提交');
   if (!bdId) return alert('请选择所属BD');
   if (!hasExp) return alert('请选择是否有交易所经验');
   const prev = as.editingId ? agentData.find(x => x.id === as.editingId) : null;
